@@ -4,10 +4,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        main: ["Roboto", "sans-serif"],
+        main: ["Nunito", "sans-serif"],
       },
       colors: {
-        "main-bg": "#fafafa4d",
+        "main-bg": "#fafafa",
+        main: "#ffae5b",
       },
     },
   },
