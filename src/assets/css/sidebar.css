@@ -1,0 +1,10 @@
+.sidebar .ant-menu-item,
+.sidebar .ant-menu-submenu-title {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar .ant-menu-item svg,
+.sidebar .ant-menu-submenu-title svg {
+  flex-shrink: 0;
+}

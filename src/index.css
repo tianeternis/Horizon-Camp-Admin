@@ -14,7 +14,7 @@
   }
 
   body {
-    background-color: var(--color-main-bg);
+    background-color: var(--color-main-bg) !important;
     font-family: var(--font-main);
   }
 }
