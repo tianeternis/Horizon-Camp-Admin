@@ -1,3 +1,4 @@
+import Topbar from "@/components/header/Topbar";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { ConfigProvider, Layout } from "antd";
 import { useState } from "react";
@@ -7,9 +8,14 @@ const { Content } = Layout;
 
 const SIDEBAR_WIDTH = 240;
 const COLLAPSE_WIDTH = 90;
+const HEADER_HEIGHT = 96;
 
 const MainLayout = ({}) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+
+  const handleCollapse = () => {
+    setCollapsed((prev) => !prev);
+  };
 
   return (
     <ConfigProvider
@@ -17,6 +23,14 @@ const MainLayout = ({}) => {
         token: {
           colorBgLayout: "var(--color-main-bg)",
           fontFamily: "var(--font-main)",
+        },
+        components: {
+          Layout: {
+            bodyBg: "var(--color-main-bg)",
+            headerBg: "var(--color-main-bg)",
+            headerPadding: 0,
+            headerHeight: "auto",
+          },
         },
       }}
     >
@@ -31,14 +45,11 @@ const MainLayout = ({}) => {
             marginInlineStart: !collapsed ? SIDEBAR_WIDTH : COLLAPSE_WIDTH,
           }}
         >
+          <Topbar collapsed={collapsed} handleCollapse={handleCollapse} />
           <Content>
-            <button
-              className="bg-red-400 p-4"
-              onClick={() => setCollapsed((prev) => !prev)}
-            >
-              Collapse
-            </button>
-            <Outlet />
+            <div className="w-full px-6 py-8">
+              <Outlet />
+            </div>
           </Content>
         </Layout>
       </Layout>

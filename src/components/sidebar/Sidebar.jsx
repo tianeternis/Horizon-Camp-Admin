@@ -12,78 +12,68 @@ import {
 import { AiFillProduct } from "react-icons/ai";
 import { MdReviews } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { ConfigProvider, Flex, Layout, Menu } from "antd";
+import { ConfigProvider, Layout, Menu } from "antd";
 
 const { Sider } = Layout;
 
 const SITEMAP = [
   {
     key: "dashboard",
-    path: "/",
-    label: "Dashboard",
+    label: <Link to="/">Dashboard</Link>,
     icon: <BiSolidDashboard />,
   },
   {
     key: "statistical",
-    path: "/statistical",
-    label: "Thống kê",
+    label: <Link to="/statistical">Thống kê</Link>,
     icon: <BiSolidPieChartAlt2 />,
   },
   {
     key: "user",
-    path: "/user",
-    label: "Người dùng",
+    label: <Link to="/user">Người dùng</Link>,
     icon: <BiSolidUser />,
   },
   {
-    label: "Sản phẩm",
+    key: "product",
+    label: "Sản phẩm", // Submenu không cần Link, nó là tiêu đề
     icon: <AiFillProduct />,
     children: [
       {
         key: "manage-category",
-        path: "/manage-category",
-        label: "Quản lý danh mục",
+        label: <Link to="/manage-category">Quản lý danh mục</Link>,
       },
       {
         key: "manage-brand",
-        path: "/manage-brand",
-        label: "Quản lý thương hiệu",
+        label: <Link to="/manage-brand">Quản lý thương hiệu</Link>,
       },
       {
         key: "manage-product",
-        path: "/manage-product",
-        label: "Quản lý món ăn",
+        label: <Link to="/manage-product">Quản lý món ăn</Link>,
       },
     ],
   },
   {
     key: "order",
-    path: "/order",
-    label: "Đơn hàng",
+    label: <Link to="/order">Đơn hàng</Link>,
     icon: <BiSolidCartAlt />,
   },
   {
     key: "blog",
-    path: "/blog",
-    label: "Cẩm nang dã ngoại",
+    label: <Link to="/blog">Cẩm nang dã ngoại</Link>,
     icon: <BiSolidBook />,
   },
   {
     key: "coupon",
-    path: "/coupon",
-    label: "Khuyến mãi",
+    label: <Link to="/coupon">Khuyến mãi</Link>,
     icon: <BiSolidCoupon />,
   },
   {
     key: "contact",
-    path: "/contact",
-    label: "Liên hệ",
+    label: <Link to="/contact">Liên hệ</Link>,
     icon: <BiSupport />,
   },
   {
     key: "review",
-    path: "/review",
-    label: "Đánh giá",
+    label: <Link to="/review">Đánh giá</Link>,
     icon: <MdReviews />,
   },
 ];
@@ -137,32 +127,17 @@ const Sidebar = ({ collapsed = false, width = 240, collapsedWidth = 90 }) => {
               subMenuItemBg: "#fff",
               itemActiveBg: "#fff5e6",
               itemSelectedBg: "#fff5e6",
-              itemSelectedColor: "#ff8c16",
+              itemSelectedColor: "var(--color-main)",
             },
           },
         }}
       >
         <Menu
           mode="inline"
+          items={SITEMAP}
           defaultSelectedKeys={[SITEMAP[0].key]}
           style={{ border: "none", fontWeight: "600" }}
-        >
-          {SITEMAP.map((item) =>
-            item.children ? (
-              <Menu.SubMenu key={item.key} title={item.label} icon={item.icon}>
-                {item.children.map((child) => (
-                  <Menu.Item key={child.key}>
-                    <Link to={child.path}>{child.label}</Link>
-                  </Menu.Item>
-                ))}
-              </Menu.SubMenu>
-            ) : (
-              <Menu.Item key={item.key} icon={item.icon}>
-                <Link to={item.path}>{item.label}</Link>
-              </Menu.Item>
-            ),
-          )}
-        </Menu>
+        />
       </ConfigProvider>
     </Sider>
   );
