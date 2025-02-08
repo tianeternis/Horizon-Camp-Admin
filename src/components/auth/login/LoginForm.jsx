@@ -1,5 +1,8 @@
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/constants";
-import { Form, Button } from "antd";
+import { Form, Button, Input } from "antd";
+import useFormInstance from "antd/es/form/hooks/useFormInstance";
+import { MdKey, MdKeyOff } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const INPUT_NAME = {
   EMAIL: "email",
@@ -21,36 +24,26 @@ const LoginForm = () => {
       layout="vertical"
       autoComplete="off"
       requiredMark={false}
+      className="login-form"
     >
       <Form.Item
         name={INPUT_NAME.EMAIL}
+        label={<span className="text-base font-semibold">Email *</span>}
         rules={[
           { required: true, message: "Vui lòng nhập email!" },
           { type: "email", message: "Email không hợp lệ!" },
         ]}
-        // help={<></>}
+        className="form-input-item"
       >
-        <div className="flex flex-col-reverse gap-1">
-          <input
-            id={`login-input-${INPUT_NAME.EMAIL}`}
-            type="email"
-            placeholder="example@gmail.com"
-            className="peer block w-full rounded-xl border border-solid border-gray-300 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-gray-500 focus:border-main"
-            onChange={(e) =>
-              form.setFieldValue(INPUT_NAME.EMAIL, e.target.value)
-            }
-            onBlur={() => form.validateFields([INPUT_NAME.EMAIL])}
-          />
-          <label
-            htmlFor={`login-input-${INPUT_NAME.EMAIL}`}
-            className="text-base font-semibold peer-focus:text-main"
-          >
-            Email *
-          </label>
-        </div>
+        <Input
+          placeholder="example@gmail.com"
+          onBlur={() => form.validateFields([INPUT_NAME.EMAIL])}
+          className="login-input"
+        />
       </Form.Item>
       <Form.Item
         name={INPUT_NAME.PASSWORD}
+        label={<span className="text-base font-semibold">Mật khẩu *</span>}
         rules={[
           { required: true, message: "Vui lòng nhập mật khẩu!" },
           {
@@ -62,29 +55,26 @@ const LoginForm = () => {
             message: `Mật khẩu phải có nhiều nhất ${PASSWORD_MAX} ký tự!`,
           },
         ]}
-        help={<></>}
+        className="form-input-item"
       >
-        <div className="flex flex-col-reverse gap-1">
-          <input
-            id={`login-input-${INPUT_NAME.PASSWORD}`}
-            type="password"
-            placeholder={`Ít nhất ${PASSWORD_MIN} ký tự`}
-            className="peer block w-full rounded-xl border border-solid border-gray-300 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-gray-500 focus:border-main"
-            onChange={(e) =>
-              form.setFieldValue(INPUT_NAME.PASSWORD, e.target.value)
-            }
-            onBlur={() => form.validateFields([INPUT_NAME.PASSWORD])}
-          />
-          <label
-            htmlFor={`login-input-${INPUT_NAME.PASSWORD}`}
-            className="text-base font-semibold peer-focus:text-main"
-          >
-            Mật khẩu *
-          </label>
-        </div>
+        <Input.Password
+          placeholder={`Ít nhất ${PASSWORD_MIN} ký tự`}
+          onBlur={() => form.validateFields([INPUT_NAME.PASSWORD])}
+          iconRender={(visible) => (
+            <div>{visible ? <MdKey /> : <MdKeyOff />}</div>
+          )}
+          className="login-input"
+        />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <div className="-mt-7 w-full text-right font-medium">
+          <Link className="text-main hover:text-orange-600">
+            Quên mật khẩu?
+          </Link>
+        </div>
+      </Form.Item>
+      <Form.Item className="form-btn-item">
+        <Button htmlType="submit" className="form-submit-btn">
           Đăng nhập
         </Button>
       </Form.Item>

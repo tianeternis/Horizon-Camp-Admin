@@ -1,3 +1,4 @@
+import "@/assets/css/auth.css";
 import logo from "@/assets/images/logo.webp";
 import loginImg from "@/assets/images/login-img.webp";
 import { useDynamicTitle } from "@/hooks";
@@ -8,10 +9,10 @@ const Login = ({}) => {
   useDynamicTitle("Đăng nhập");
 
   return (
-    <div className="h-screen w-full bg-main-bg">
+    <div className="login h-screen w-full bg-main-bg">
       <div className="flex">
-        <div className="w-3/10 h-screen shrink-0 bg-white">
-          <div className="space-y-12 p-10">
+        <div className="flex h-screen w-3/10 shrink-0 items-center justify-center bg-white">
+          <div className="w-full shrink-0 space-y-14 p-10">
             <div className="flex items-center justify-center">
               <Link to="/" className="w-fit">
                 <img
