@@ -47,7 +47,7 @@ const MainLayout = ({}) => {
         >
           <Topbar collapsed={collapsed} handleCollapse={handleCollapse} />
           <Content>
-            <div className="w-full px-6 py-8">
+            <div className="w-full px-6 pb-6">
               <Outlet />
             </div>
           </Content>

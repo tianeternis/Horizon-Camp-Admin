@@ -29,7 +29,7 @@ const SITEMAP = [
   },
   {
     key: "user",
-    label: <Link to="/user">Người dùng</Link>,
+    label: <Link to="/manage-user">Quản lý người dùng</Link>,
     icon: <BiSolidUser />,
   },
   {
