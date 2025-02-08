@@ -14,14 +14,12 @@ const Login = ({}) => {
         <div className="flex h-screen w-3/10 shrink-0 items-center justify-center bg-white">
           <div className="w-full shrink-0 space-y-14 p-10">
             <div className="flex items-center justify-center">
-              <Link to="/" className="w-fit">
-                <img
-                  src={logo}
-                  alt="Logo"
-                  loading="lazy"
-                  className="w-28 shrink-0 object-cover"
-                />
-              </Link>
+              <img
+                src={logo}
+                alt="Logo"
+                loading="lazy"
+                className="w-28 shrink-0 object-cover"
+              />
             </div>
             <div className="text-center text-3xl font-semibold">Đăng nhập</div>
             <div>
