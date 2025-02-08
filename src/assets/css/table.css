@@ -1,0 +1,5 @@
+.custom-table .ant-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: #eaeaea transparent;
+  scrollbar-gutter: stable;
+}
