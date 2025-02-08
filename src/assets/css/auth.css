@@ -1,0 +1,66 @@
+.login {
+  --color-input-placeholder: #666666;
+}
+
+.login .login-form .form-input-item:has(.ant-input-status-error) {
+  margin-bottom: 45px;
+}
+
+.login .login-form .login-input {
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.login .login-form .login-input:not(.ant-input-status-error) {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: transparent;
+}
+
+.login .login-form .ant-input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.login .login-form .login-input:not(.ant-input-status-error):focus,
+.login .login-form .login-input:not(.ant-input-status-error):focus-within {
+  border-color: var(--color-main);
+}
+
+.login .login-form .login-input.ant-input-password .ant-input-password-icon {
+  font-size: 16px;
+  color: var(--color-input-placeholder);
+  cursor: pointer;
+}
+
+.login
+  .login-form
+  .login-input.ant-input-password
+  .ant-input-password-icon:hover {
+  color: black;
+}
+
+.login .login-form .form-btn-item {
+  margin: 0;
+}
+
+.login .login-form .form-submit-btn {
+  width: 100%;
+  height: auto;
+  padding: 8px 0;
+  border-radius: 10px;
+  font-size: 16px;
+  border: none;
+  background: var(--color-main);
+  color: white;
+}
+
+.login .login-form .form-submit-btn:hover {
+  background: rgb(255, 119, 0);
+  color: white;
+}
+
+.login .login-form .ant-form-item-explain {
+  margin-top: 2px;
+}
