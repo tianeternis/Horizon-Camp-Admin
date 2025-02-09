@@ -7,6 +7,7 @@ import Login from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
 import AppLayout from "@/layouts/AppLayout";
 import User from "@/pages/User";
+import Category from "@/pages/Category";
 
 const routes = [
   {
@@ -23,6 +24,10 @@ const routes = [
           {
             path: "manage-user",
             element: <User />,
+          },
+          {
+            path: "manage-category",
+            element: <Category />,
           },
         ],
       },
