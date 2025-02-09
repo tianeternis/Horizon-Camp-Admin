@@ -2,12 +2,17 @@ import "@/assets/css/table.css";
 import DataDisplayOptions from "@/components/table/options/DataDisplayOptions";
 import FilterMenu from "@/components/table/filter/FilterMenu";
 import SearchInput from "@/components/table/search/SearchInput";
+import Avatar from "@/components/avatar/Avatar";
+import { BUTTON_HEIGHT } from "@/components/table/constants";
+import {
+  formatDateToDDMMYYYY,
+  formatDateToHHMMDDMMYYYY,
+} from "@/utils/format/date";
 import { useState } from "react";
 import { FaUsers, FaTransgenderAlt } from "react-icons/fa";
 import { HiMiniUserPlus } from "react-icons/hi2";
-import { Table } from "antd";
-import { BUTTON_HEIGHT } from "@/components/table/constants";
-import Avatar from "@/components/avatar/Avatar";
+import { BiEditAlt, BiTrash } from "react-icons/bi";
+import { Empty, Table, Tag, Tooltip } from "antd";
 
 const PAGE_SIZE = 10;
 
@@ -35,24 +40,19 @@ const columns = [
     dataIndex: "STT",
     width: 50,
     align: "center",
-    render: (value, record, index) => <span>{index}</span>,
-  },
-  {
-    key: "avatar",
-    title: "Ảnh đại diện",
-    dataIndex: "avatar",
-    width: 80,
-    align: "center",
-    render: (value, record, index) => (
-      <div className="flex justify-center">
-        <Avatar src={record?.avatar || undefined} size={36} />
-      </div>
-    ),
+    render: (_, __, index) => <span>{index}</span>,
   },
   {
     key: "fullname",
-    title: "Họ và tên",
+    title: "Người dùng",
     dataIndex: "fullname",
+    align: "center",
+    render: (_, record) => (
+      <div className="flex items-center gap-2.5">
+        <Avatar src={record?.avatar || undefined} size={36} />
+        <span className="font-semibold">{record?.fullname}</span>
+      </div>
+    ),
   },
   {
     key: "email",
@@ -63,16 +63,22 @@ const columns = [
     key: "phone",
     title: "Số điện thoại",
     dataIndex: "phone",
+    width: 110,
   },
   {
     key: "birthday",
     title: "Ngày sinh",
     dataIndex: "birthday",
+    width: 100,
+    render: (birthday) => formatDateToDDMMYYYY(birthday),
   },
   {
     key: "gender",
     title: "Giới tính",
     dataIndex: "gender",
+    width: 75,
+    render: (gender) =>
+      gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Khác",
   },
   {
     key: "address",
@@ -83,27 +89,57 @@ const columns = [
     key: "role",
     title: "Vai trò",
     dataIndex: "role",
+    width: 125,
+    render: ({ key, value }) => (
+      <Tag
+        color={key === "customer" ? "green" : key === "staff" ? "blue" : "gold"}
+      >
+        <span className="uppercase">{value}</span>
+      </Tag>
+    ),
   },
   {
-    key: "created-date",
+    key: "createdAt",
     title: "Ngày tạo",
-    dataIndex: "created-date",
+    dataIndex: "createdAt",
+    width: 140,
+    render: (createdAt) => formatDateToHHMMDDMMYYYY(createdAt),
   },
   {
     key: "actions",
     title: "Hành động",
     dataIndex: "actions",
+    width: 90,
+    render: () => (
+      <div className="flex items-center justify-center gap-2.5">
+        <Tooltip title="Chỉnh sửa">
+          <button className="text-xl text-green-600">
+            <BiEditAlt />
+          </button>
+        </Tooltip>
+        <Tooltip title="Xóa">
+          <button className="text-xl text-red-600">
+            <BiTrash />
+          </button>
+        </Tooltip>
+      </div>
+    ),
   },
 ];
 
 const dataSource = Array.from({
-  length: 46,
+  length: 40,
 }).map((_, i) => ({
   key: i,
-  fullname: `Edward King ${i}`,
+  fullname: `Nguyễn Thiên Vũ ${i}`,
   avatar: "https://dongvat.edu.vn/upload/2025/01/avatar-vo-tri-meo-01.webp",
-  age: 32,
-  address: `London, Park Lane no. ${i}`,
+  email: "nguyenthienvu@gmail.com",
+  phone: "0123456789",
+  birthday: new Date(),
+  gender: "male",
+  address: `Nguyễn Văn Cừ, Xuân Khánh, Cần Thơ ${i}`,
+  role: { key: "admin", value: "Quản trị viên" },
+  createdAt: new Date(),
 }));
 
 const defaultDataOptionsCheckedList = columns.map((item) => item.key);
@@ -176,6 +212,9 @@ const UserTable = ({}) => {
         size="middle"
         components={{
           body: {
+            row: (props) => (
+              <tr {...props} className="duration-150 hover:bg-[#fafafa]" />
+            ),
             cell: (props) => <td {...props} className="align-middle" />,
           },
         }}
@@ -188,7 +227,8 @@ const UserTable = ({}) => {
           onChange: (page) => setCurrentPage(page),
           style: { marginBottom: 0, marginTop: 24 },
         }}
-        scroll={{ y: 349 }}
+        scroll={{ y: 371 }}
+        locale={{ emptyText: <Empty description="Không có dữ liệu" /> }}
         className="custom-table"
       />
     </div>
