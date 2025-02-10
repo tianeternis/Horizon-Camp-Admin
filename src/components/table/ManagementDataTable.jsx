@@ -3,7 +3,7 @@ import DataDisplayOptions from "./options/DataDisplayOptions";
 import FilterMenu from "./filter/FilterMenu";
 import SearchInput from "./search/SearchInput";
 import { Empty, Table, Tooltip } from "antd";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { BUTTON_HEIGHT } from "./constants";
 import { RiResetLeftFill } from "react-icons/ri";
 
@@ -11,6 +11,14 @@ const DEFAULT_TABLE = {
   columns: [],
   dataSource: [],
   hasIndexColumn: false,
+  scroll: {
+    hasScroll: false,
+    scrollSetting: {
+      scrollToFirstRowOnChange: true,
+      x: undefined,
+      y: undefined,
+    },
+  },
 };
 
 const DEFAULT_PAGINATION = {
@@ -63,6 +71,7 @@ const DEFAULT_ACTIONS = {
       icon: <></>,
       onClick: (data) => {},
       showAction: (data) => true,
+      render: (data) => <></>,
     },
   ],
   widthColumn: 90,
@@ -106,7 +115,14 @@ const ManagementDataTable = ({
                   (action, i) =>
                     (action?.showAction
                       ? action?.showAction(record) === true
-                      : true) && (
+                      : true) &&
+                    (action?.render && typeof action?.render === "function" ? (
+                      <Fragment
+                        key={`data-table-actions-render-${action?.title}-${i}`}
+                      >
+                        {action?.render(record)}
+                      </Fragment>
+                    ) : (
                       <Tooltip
                         key={`data-table-actions-${action?.title}-${i}`}
                         title={action?.title}
@@ -118,7 +134,7 @@ const ManagementDataTable = ({
                           {action?.icon}
                         </button>
                       </Tooltip>
-                    ),
+                    )),
                 )}
               </div>
             ),
@@ -239,7 +255,12 @@ const ManagementDataTable = ({
               }
             : false
         }
-        {...(pagination?.total > 0 ? { scroll: { y: 363 } } : {})}
+        // {...(pagination?.total > 0 ? { scroll: { y: 363 } } : {})}
+        {...(table?.scroll?.hasScroll
+          ? pagination?.total > 0
+            ? { scroll: table?.scroll?.scrollSetting || {} }
+            : {}
+          : {})}
         locale={{ emptyText: <Empty description="Không có dữ liệu" /> }}
         className="custom-table"
       />

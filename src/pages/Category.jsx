@@ -1,13 +1,10 @@
+import { useDynamicTitle } from "@/hooks";
 import ManagementContentLayout from "@/layouts/ManagementContentLayout";
 import ManagementDataTable from "@/components/table/ManagementDataTable";
-import Avatar from "@/components/avatar/Avatar";
-import {
-  formatDateToDDMMYYYY,
-  formatDateToHHMMDDMMYYYY,
-} from "@/utils/format/date";
+import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
 import { Image, Tag } from "antd";
 import { BiEditAlt, BiSolidCategory, BiTrash } from "react-icons/bi";
-import { LuListPlus } from "react-icons/lu";
+import { HiSquaresPlus } from "react-icons/hi2";
 import { FiEye } from "react-icons/fi";
 import { useState } from "react";
 
@@ -38,7 +35,7 @@ const columns = [
     title: "Tên danh mục",
     dataIndex: "name",
     align: "center",
-    // width: "15%",
+    width: "15%",
     render: (value) => <div className="text-center font-semibold">{value}</div>,
   },
   {
@@ -83,6 +80,8 @@ const dataSource = Array.from({
 }));
 
 const Category = ({}) => {
+  useDynamicTitle("Quản lý danh mục sản phẩm");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyWords, setSearchKeyWords] = useState("");
   const [categoryLevel, setCategoryLevel] = useState(DEFAULT_CATEGORY_LEVEL);
@@ -96,7 +95,15 @@ const Category = ({}) => {
   return (
     <ManagementContentLayout title="Quản lý danh mục sản phẩm">
       <ManagementDataTable
-        table={{ columns, dataSource, hasIndexColumn: true }}
+        table={{
+          columns,
+          dataSource,
+          hasIndexColumn: true,
+          scroll: {
+            hasScroll: true,
+            scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
+          },
+        }}
         pagination={{
           hasPagination: true,
           current: currentPage,
@@ -131,12 +138,12 @@ const Category = ({}) => {
           buttonsMenu: [
             {
               title: "Thêm danh mục cấp 1",
-              icon: <LuListPlus />,
+              icon: <HiSquaresPlus />,
               onClick: () => console.log("Thêm danh mục cấp 1 mới"),
             },
             {
               title: "Thêm danh mục cấp 2",
-              icon: <LuListPlus />,
+              icon: <HiSquaresPlus />,
               onClick: () => console.log("Thêm danh mục cấp 2 mới"),
             },
           ],

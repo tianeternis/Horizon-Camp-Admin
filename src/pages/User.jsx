@@ -1,3 +1,4 @@
+import { useDynamicTitle } from "@/hooks";
 import ManagementContentLayout from "@/layouts/ManagementContentLayout";
 import ManagementDataTable from "@/components/table/ManagementDataTable";
 import Avatar from "@/components/avatar/Avatar";
@@ -8,8 +9,8 @@ import {
 import { Tag } from "antd";
 import { BiEditAlt, BiTrash } from "react-icons/bi";
 import { FaTransgenderAlt, FaUsers } from "react-icons/fa";
-import { useState } from "react";
 import { HiMiniUserPlus } from "react-icons/hi2";
+import { useState } from "react";
 
 const DATA_LENGTH = 40;
 const PAGE_SIZE = 10;
@@ -118,6 +119,8 @@ const dataSource = Array.from({
 }));
 
 const User = ({}) => {
+  useDynamicTitle("Quản lý người dùng");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState(DEFAULT_FILTER);
   const [searchKeyWords, setSearchKeyWords] = useState("");
@@ -135,7 +138,15 @@ const User = ({}) => {
   return (
     <ManagementContentLayout title="Quản lý người dùng">
       <ManagementDataTable
-        table={{ columns, dataSource, hasIndexColumn: true }}
+        table={{
+          columns,
+          dataSource,
+          hasIndexColumn: true,
+          scroll: {
+            hasScroll: true,
+            scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
+          },
+        }}
         pagination={{
           hasPagination: true,
           current: currentPage,

@@ -8,6 +8,8 @@ import NotFound from "@/pages/NotFound";
 import AppLayout from "@/layouts/AppLayout";
 import User from "@/pages/User";
 import Category from "@/pages/Category";
+import Brand from "@/pages/Brand";
+import PicnicGuide from "@/pages/PicnicGuide";
 
 const routes = [
   {
@@ -28,6 +30,14 @@ const routes = [
           {
             path: "manage-category",
             element: <Category />,
+          },
+          {
+            path: "manage-brand",
+            element: <Brand />,
+          },
+          {
+            path: "picnic-guide",
+            element: <PicnicGuide />,
           },
         ],
       },

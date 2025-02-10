@@ -47,7 +47,7 @@ const SITEMAP = [
       },
       {
         key: "manage-product",
-        label: <Link to="/manage-product">Quản lý món ăn</Link>,
+        label: <Link to="/manage-product">Quản lý sản phẩm</Link>,
       },
     ],
   },
@@ -57,8 +57,8 @@ const SITEMAP = [
     icon: <BiSolidCartAlt />,
   },
   {
-    key: "blog",
-    label: <Link to="/blog">Cẩm nang dã ngoại</Link>,
+    key: "picnic-guide",
+    label: <Link to="/picnic-guide">Cẩm nang dã ngoại</Link>,
     icon: <BiSolidBook />,
   },
   {
