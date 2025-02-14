@@ -9,6 +9,7 @@ const Avatar = ({ size = 32, src, ...props }) => {
         style={{
           backgroundColor: "#fff",
           color: "#ccc",
+          border: "1px solid #d9d9d9",
         }}
         icon={<UserOutlined />}
         src={src || undefined}

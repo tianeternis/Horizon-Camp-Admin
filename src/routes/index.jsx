@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import PrivateRoute from "./private/PrivateRoute";
 
 import MainLayout from "@/layouts/MainLayout";
 
@@ -17,7 +18,11 @@ const routes = [
     element: <AppLayout />,
     children: [
       {
-        element: <MainLayout />,
+        element: (
+          <PrivateRoute>
+            <MainLayout />
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
