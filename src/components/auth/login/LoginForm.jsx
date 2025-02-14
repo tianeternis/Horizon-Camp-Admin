@@ -1,8 +1,12 @@
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/constants";
+import { loginSuccess } from "@/redux/reducer/userSlice";
+import { login } from "@/services/authService";
+import StatusCodes from "@/utils/status/StatusCodes";
 import { Form, Button, Input } from "antd";
-import useFormInstance from "antd/es/form/hooks/useFormInstance";
 import { MdKey, MdKeyOff } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const INPUT_NAME = {
   EMAIL: "email",
@@ -12,8 +16,20 @@ const INPUT_NAME = {
 const LoginForm = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log("Success:", values);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
+    const res = await login(values);
+
+    if (res && res.EC === StatusCodes.SUCCESS) {
+      dispatch(loginSuccess(res.DT));
+      navigate("/", { replace: true });
+    }
+
+    if (res && res.EC === StatusCodes.ERRROR) {
+      toast.error(res.EC);
+    }
   };
 
   return (

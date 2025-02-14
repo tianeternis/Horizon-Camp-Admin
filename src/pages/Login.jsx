@@ -3,9 +3,13 @@ import logo from "@/assets/images/logo.webp";
 import loginImg from "@/assets/images/login-img.webp";
 import { useDynamicTitle } from "@/hooks";
 import LoginForm from "@/components/auth/login/LoginForm";
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 const Login = ({}) => {
+  const isAuth = useSelector((state) => state.user.isAuth);
+  if (isAuth) return <Navigate to="/not-found" />;
+
   useDynamicTitle("Đăng nhập");
 
   return (
