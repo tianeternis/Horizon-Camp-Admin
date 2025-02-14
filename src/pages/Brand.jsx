@@ -6,6 +6,7 @@ import { Image } from "antd";
 import { BiEditAlt, BiTrash } from "react-icons/bi";
 import { LuBadgePlus } from "react-icons/lu";
 import { useState } from "react";
+import AddBrandModal from "@/components/brand/AddBrandModal";
 
 const DATA_LENGTH = 40;
 const PAGE_SIZE = 10;
@@ -61,68 +62,78 @@ const Brand = ({}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyWords, setSearchKeyWords] = useState("");
 
+  const [showAddModal, setShowAddModal] = useState(false);
+
   const handleReset = () => {
     setCurrentPage(1);
     setSearchKeyWords("");
   };
 
   return (
-    <ManagementContentLayout title="Quản lý thương hiệu">
-      <ManagementDataTable
-        table={{
-          columns,
-          dataSource,
-          hasIndexColumn: true,
-          scroll: {
-            hasScroll: true,
-            scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
-          },
-        }}
-        pagination={{
-          hasPagination: true,
-          current: currentPage,
-          onChange: (page) => setCurrentPage(+page),
-          total: DATA_LENGTH,
-          pageSize: PAGE_SIZE,
-          showTotal: (total) => `Tổng thương hiệu: ${total}`,
-        }}
-        search={{
-          hasSearchInput: true,
-          value: searchKeyWords,
-          setValue: setSearchKeyWords,
-          placeholder: "Tìm kiếm theo Tên thương hiệu hoặc Mô tả",
-          width: 360,
-          onSubmit: () => console.log(searchKeyWords),
-        }}
-        reset={{ hasResetButton: true, onClick: handleReset }}
-        crudButton={{
-          hasCRUDButton: true,
-          buttonsMenu: [
-            {
-              title: "Thêm thương hiệu",
-              icon: <LuBadgePlus />,
-              onClick: () => console.log("Thêm thương hiệu mới"),
+    <div>
+      <ManagementContentLayout title="Quản lý thương hiệu">
+        <ManagementDataTable
+          table={{
+            columns,
+            dataSource,
+            hasIndexColumn: true,
+            scroll: {
+              hasScroll: true,
+              scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
             },
-          ],
-        }}
-        actions={{
-          hasActions: true,
-          actionsMenu: [
-            {
-              title: "Chỉnh sửa",
-              icon: <BiEditAlt className="text-green-600" />,
-              onClick: (data) => console.log("Sửa ", data),
-            },
-            {
-              title: "Xóa",
-              icon: <BiTrash className="text-red-600" />,
-              onClick: (data) => console.log("Xóa ", data),
-            },
-          ],
-          widthColumn: 90,
-        }}
-      />
-    </ManagementContentLayout>
+          }}
+          pagination={{
+            hasPagination: true,
+            current: currentPage,
+            onChange: (page) => setCurrentPage(+page),
+            total: DATA_LENGTH,
+            pageSize: PAGE_SIZE,
+            showTotal: (total) => `Tổng thương hiệu: ${total}`,
+          }}
+          search={{
+            hasSearchInput: true,
+            value: searchKeyWords,
+            setValue: setSearchKeyWords,
+            placeholder: "Tìm kiếm theo Tên thương hiệu hoặc Mô tả",
+            width: 360,
+            onSubmit: () => console.log(searchKeyWords),
+          }}
+          reset={{ hasResetButton: true, onClick: handleReset }}
+          crudButton={{
+            hasCRUDButton: true,
+            buttonsMenu: [
+              {
+                title: "Thêm thương hiệu",
+                icon: <LuBadgePlus />,
+                onClick: () => setShowAddModal(true),
+              },
+            ],
+          }}
+          actions={{
+            hasActions: true,
+            actionsMenu: [
+              {
+                title: "Chỉnh sửa",
+                icon: <BiEditAlt className="text-green-600" />,
+                onClick: (data) => console.log("Sửa ", data),
+              },
+              {
+                title: "Xóa",
+                icon: <BiTrash className="text-red-600" />,
+                onClick: (data) => console.log("Xóa ", data),
+              },
+            ],
+            widthColumn: 90,
+          }}
+        />
+      </ManagementContentLayout>
+      {showAddModal && (
+        <AddBrandModal
+          open={showAddModal}
+          handleClose={() => setShowAddModal(false)}
+        />
+      )}
+    </div>
   );
 };
 
