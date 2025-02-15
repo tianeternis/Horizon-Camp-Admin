@@ -1,6 +1,7 @@
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Form, Image, Input, Upload } from "antd";
 import { useState } from "react";
+import SingleUpload from "../upload/SingleUpload";
 
 const INPUT_NAME = {
   NAME: "name",
@@ -8,17 +9,11 @@ const INPUT_NAME = {
   IMAGE: "image",
 };
 
-const BrandForm = ({ name = "" }) => {
+const BrandForm = ({ name = "", handleSave = (data) => {} }) => {
   const [form] = Form.useForm();
 
-  const [images, setImages] = useState([]);
-  const [previewImage, setPreviewImage] = useState({
-    visible: false,
-    image: "",
-  });
-
-  const onFinish = async (values) => {
-    console.log(values);
+  const onFinish = (values) => {
+    handleSave(values);
   };
 
   return (
@@ -46,58 +41,24 @@ const BrandForm = ({ name = "" }) => {
       >
         <Input.TextArea
           rows={4}
+          spellCheck={false}
           onBlur={() => form.validateFields([INPUT_NAME.DESCRIPTION])}
         />
       </Form.Item>
-      <Form.Item
-        name={INPUT_NAME.IMAGE}
-        label="Hình ảnh"
-        rules={[
-          { required: true, message: "Vui lòng tải lên hình ảnh thương hiệu!" },
-        ]}
-      >
-        <Upload
-          accept="image/*"
-          listType="picture"
-          maxCount={1}
-          fileList={images}
-          onChange={({ file, fileList }) => {
-            setImages(fileList);
-            form.setFieldsValue({ [INPUT_NAME.IMAGE]: file });
-          }}
-          onRemove={() => {
-            setImages([]);
-            form.setFieldValue(INPUT_NAME.IMAGE, null);
-            return false;
-          }}
-          onPreview={(file) => {
-            setPreviewImage({
-              visible: true,
-              image: URL.createObjectURL(file?.originFileObj),
-            });
-          }}
-          beforeUpload={() => false}
+      <Form.Item label="Hình ảnh">
+        <SingleUpload
+          name={INPUT_NAME.IMAGE}
+          form={form}
+          rules={[
+            {
+              required: true,
+              message: "Vui lòng tải lên hình ảnh thương hiệu!",
+            },
+          ]}
         >
           <Button icon={<UploadOutlined />}>Tải hình ảnh lên</Button>
-        </Upload>
+        </SingleUpload>
       </Form.Item>
-      {previewImage.visible && previewImage.image && (
-        <Image
-          wrapperStyle={{ display: "none" }}
-          preview={{
-            visible: previewImage.visible,
-            onVisibleChange: (visible) => {
-              if (visible) {
-                setPreviewImage((prev) => ({ ...prev, visible }));
-              } else {
-                URL.revokeObjectURL(previewImage.image);
-                setPreviewImage({ visible, image: "" });
-              }
-            },
-          }}
-          src={previewImage.image}
-        />
-      )}
     </Form>
   );
 };

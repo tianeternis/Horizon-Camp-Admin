@@ -19,6 +19,7 @@ const DEFAULT_TABLE = {
       y: undefined,
     },
   },
+  loading: false,
 };
 
 const DEFAULT_PAGINATION = {
@@ -231,6 +232,7 @@ const ManagementDataTable = ({
       <Table
         columns={displayColumns}
         dataSource={table.dataSource}
+        loading={table?.loading}
         bordered
         size="middle"
         components={{
@@ -252,10 +254,10 @@ const ManagementDataTable = ({
                 total: pagination?.total,
                 showTotal: pagination?.showTotal,
                 onChange: pagination?.onChange,
+                disabled: table?.loading,
               }
             : false
         }
-        // {...(pagination?.total > 0 ? { scroll: { y: 363 } } : {})}
         {...(table?.scroll?.hasScroll
           ? pagination?.total > 0
             ? { scroll: table?.scroll?.scrollSetting || {} }
