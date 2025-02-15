@@ -1,5 +1,5 @@
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Upload } from "antd";
+import { Button, Form, Image, Input, Upload } from "antd";
 import { useState } from "react";
 
 const INPUT_NAME = {
@@ -12,6 +12,10 @@ const BrandForm = ({ name = "" }) => {
   const [form] = Form.useForm();
 
   const [images, setImages] = useState([]);
+  const [previewImage, setPreviewImage] = useState({
+    visible: false,
+    image: "",
+  });
 
   const onFinish = async (values) => {
     console.log(values);
@@ -59,18 +63,41 @@ const BrandForm = ({ name = "" }) => {
           fileList={images}
           onChange={({ file, fileList }) => {
             setImages(fileList);
-            form.setFieldValue(INPUT_NAME.IMAGE, file);
+            form.setFieldsValue({ [INPUT_NAME.IMAGE]: file });
           }}
           onRemove={() => {
             setImages([]);
             form.setFieldValue(INPUT_NAME.IMAGE, null);
             return false;
           }}
+          onPreview={(file) => {
+            setPreviewImage({
+              visible: true,
+              image: URL.createObjectURL(file?.originFileObj),
+            });
+          }}
           beforeUpload={() => false}
         >
           <Button icon={<UploadOutlined />}>Tải hình ảnh lên</Button>
         </Upload>
       </Form.Item>
+      {previewImage.visible && previewImage.image && (
+        <Image
+          wrapperStyle={{ display: "none" }}
+          preview={{
+            visible: previewImage.visible,
+            onVisibleChange: (visible) => {
+              if (visible) {
+                setPreviewImage((prev) => ({ ...prev, visible }));
+              } else {
+                URL.revokeObjectURL(previewImage.image);
+                setPreviewImage({ visible, image: "" });
+              }
+            },
+          }}
+          src={previewImage.image}
+        />
+      )}
     </Form>
   );
 };
