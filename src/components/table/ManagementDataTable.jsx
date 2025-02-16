@@ -20,6 +20,7 @@ const DEFAULT_TABLE = {
     },
   },
   loading: false,
+  onChange: (pagination, filters, sorter) => {},
 };
 
 const DEFAULT_PAGINATION = {
@@ -265,6 +266,7 @@ const ManagementDataTable = ({
             : {}
           : {})}
         locale={{ emptyText: <Empty description="Không có dữ liệu" /> }}
+        onChange={table?.onChange}
         className="custom-table"
       />
     </div>
