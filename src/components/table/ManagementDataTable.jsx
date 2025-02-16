@@ -1,4 +1,4 @@
-import "@/assets/css/table.css";
+import "@/assets/css/scrollbar.css";
 import DataDisplayOptions from "./options/DataDisplayOptions";
 import FilterMenu from "./filter/FilterMenu";
 import SearchInput from "./search/SearchInput";
@@ -19,6 +19,7 @@ const DEFAULT_TABLE = {
       y: undefined,
     },
   },
+  loading: false,
 };
 
 const DEFAULT_PAGINATION = {
@@ -108,6 +109,7 @@ const ManagementDataTable = ({
             key: "actions",
             title: "Hành động",
             dataIndex: "actions",
+            align: "center",
             width: actions?.widthColumn,
             render: (_, record) => (
               <div className="flex items-center justify-center gap-2.5">
@@ -231,6 +233,7 @@ const ManagementDataTable = ({
       <Table
         columns={displayColumns}
         dataSource={table.dataSource}
+        loading={table?.loading}
         bordered
         size="middle"
         components={{
@@ -252,10 +255,10 @@ const ManagementDataTable = ({
                 total: pagination?.total,
                 showTotal: pagination?.showTotal,
                 onChange: pagination?.onChange,
+                disabled: table?.loading,
               }
             : false
         }
-        // {...(pagination?.total > 0 ? { scroll: { y: 363 } } : {})}
         {...(table?.scroll?.hasScroll
           ? pagination?.total > 0
             ? { scroll: table?.scroll?.scrollSetting || {} }
