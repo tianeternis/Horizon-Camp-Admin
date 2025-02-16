@@ -1,6 +1,7 @@
+import "@/assets/css/scrollbar.css";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Form, Image, Input, Upload } from "antd";
-import { useState } from "react";
+import { Button, Form, Input } from "antd";
+import { useEffect, useState } from "react";
 import SingleUpload from "../upload/SingleUpload";
 
 const INPUT_NAME = {
@@ -9,8 +10,33 @@ const INPUT_NAME = {
   IMAGE: "image",
 };
 
-const BrandForm = ({ name = "", handleSave = (data) => {} }) => {
+const BrandForm = ({
+  name = "",
+  handleSave = (data) => {},
+  edit = { editable: false, initialValue: null },
+}) => {
   const [form] = Form.useForm();
+
+  const [initialImages, setInitialImages] = useState([]);
+
+  useEffect(() => {
+    if (edit && edit.editable && edit.initialValue) {
+      const values = edit?.initialValue;
+      form.setFieldsValue({
+        [INPUT_NAME.NAME]: values?.name,
+        [INPUT_NAME.DESCRIPTION]: values?.description,
+        [INPUT_NAME.IMAGE]: values?.image,
+      });
+      setInitialImages([
+        {
+          uid: "-1",
+          name: `${values?.name}.png`,
+          status: "done",
+          url: values?.image,
+        },
+      ]);
+    }
+  }, [edit.initialValue]);
 
   const onFinish = (values) => {
     handleSave(values);
@@ -43,6 +69,7 @@ const BrandForm = ({ name = "", handleSave = (data) => {} }) => {
           rows={4}
           spellCheck={false}
           onBlur={() => form.validateFields([INPUT_NAME.DESCRIPTION])}
+          className="custom-scrollbar"
         />
       </Form.Item>
       <Form.Item label="Hình ảnh">
@@ -55,6 +82,7 @@ const BrandForm = ({ name = "", handleSave = (data) => {} }) => {
               message: "Vui lòng tải lên hình ảnh thương hiệu!",
             },
           ]}
+          initialImages={initialImages}
         >
           <Button icon={<UploadOutlined />}>Tải hình ảnh lên</Button>
         </SingleUpload>

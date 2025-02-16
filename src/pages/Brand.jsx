@@ -4,14 +4,14 @@ import ManagementContentLayout from "@/layouts/ManagementContentLayout";
 import ManagementDataTable from "@/components/table/ManagementDataTable";
 import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
 import AddBrandModal from "@/components/brand/AddBrandModal";
-import { Image } from "antd";
-import { BiEditAlt, BiTrash } from "react-icons/bi";
-import { LuBadgePlus } from "react-icons/lu";
-import { useCallback, useEffect, useState } from "react";
+import EditBrandModal from "@/components/brand/EditBrandModal";
 import { getBrands } from "@/services/brandService";
 import StatusCodes from "@/utils/status/StatusCodes";
+import { Image } from "antd";
+import { BiEditAlt } from "react-icons/bi";
+import { LuBadgePlus } from "react-icons/lu";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import _ from "lodash";
 
 const columns = [
   {
@@ -47,17 +47,6 @@ const columns = [
   },
 ];
 
-// const dataSource = Array.from({
-//   length: DATA_LENGTH,
-// }).map((_, i) => ({
-//   key: i,
-//   name: `Naturehike ${i}`,
-//   image: "https://dioutdoor.vn/media/2020/08/logo-brand-naturehike.png.webp",
-//   description:
-//     "Naturehike là một thương hiệu sản phẩm thiết bị, dụng cụ, lều trại, phụ kiện ngoài trời chuyên nghiệp. Naturehike cam kết cung cấp các sản phẩm ngoài trời nhẹ và chất lượng cao. Naturehike là một doanh nghiệp thương hiệu chuyên nghiên cứu & phát triển sản phẩm, thiết kế và sản xuất. Naturehike cung cấp các sản phẩm đi bộ đường dài, leo núi, cắm trại và các sản phẩm thể thao ngoài trời khác. Ban có thể mua sản phẩm của naturehike chính hãng tại Việt nam.",
-//   createdAt: new Date(),
-// }));
-
 const Brand = ({}) => {
   useDynamicTitle("Quản lý thương hiệu");
 
@@ -68,8 +57,7 @@ const Brand = ({}) => {
   const [loading, setLoading] = useState(false);
 
   const [showAddModal, setShowAddModal] = useState(false);
-
-  console.log(currentPage);
+  const [editModal, setEditModal] = useState({ show: false, data: null });
 
   const fetchBrands = async (search, page, limit) => {
     setLoading(true);
@@ -96,26 +84,24 @@ const Brand = ({}) => {
     setLoading(false);
   };
 
-  // const fetchBrandsDebounced = useCallback(_.debounce(fetchBrands, 300), []);
-
   useEffect(() => {
     fetchBrands(searchKeyWords, currentPage, PAGE_SIZE);
   }, []);
 
   const handleChangePage = async (page) => {
-    await fetchBrands(searchKeyWords, page, PAGE_SIZE);
     setCurrentPage(page);
+    await fetchBrands(searchKeyWords, page, PAGE_SIZE);
   };
 
   const handleSearch = async () => {
-    await fetchBrands(searchKeyWords, 1, PAGE_SIZE);
     setCurrentPage(1);
+    await fetchBrands(searchKeyWords, 1, PAGE_SIZE);
   };
 
   const handleReset = async () => {
-    await fetchBrands("", 1, PAGE_SIZE);
     setCurrentPage(1);
     setSearchKeyWords("");
+    await fetchBrands("", 1, PAGE_SIZE);
   };
 
   return (
@@ -165,15 +151,10 @@ const Brand = ({}) => {
               {
                 title: "Chỉnh sửa",
                 icon: <BiEditAlt className="text-green-600" />,
-                onClick: (data) => console.log("Sửa ", data),
-              },
-              {
-                title: "Xóa",
-                icon: <BiTrash className="text-red-600" />,
-                onClick: (data) => console.log("Xóa ", data),
+                onClick: (data) => setEditModal({ show: true, data }),
               },
             ],
-            widthColumn: 90,
+            widthColumn: 80,
           }}
         />
       </ManagementContentLayout>
@@ -181,6 +162,17 @@ const Brand = ({}) => {
         <AddBrandModal
           open={showAddModal}
           handleClose={() => setShowAddModal(false)}
+          refetch={handleReset}
+        />
+      )}
+      {editModal.show && (
+        <EditBrandModal
+          open={editModal.show}
+          handleClose={() => setEditModal({ show: false, data: null })}
+          brandID={editModal.data?._id}
+          refetch={async () =>
+            await fetchBrands(searchKeyWords, currentPage, PAGE_SIZE)
+          }
         />
       )}
     </div>

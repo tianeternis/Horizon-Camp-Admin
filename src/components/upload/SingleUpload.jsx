@@ -1,5 +1,6 @@
+import "@/assets/css/upload.css";
 import { Form, Image, Upload } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const SingleUpload = ({
   name,
@@ -7,6 +8,7 @@ const SingleUpload = ({
   rules = [],
   accept = "image/*",
   listType = "picture",
+  initialImages = [],
   children,
 }) => {
   const [images, setImages] = useState([]);
@@ -14,6 +16,10 @@ const SingleUpload = ({
     visible: false,
     image: "",
   });
+
+  useEffect(() => {
+    setImages(initialImages);
+  }, [initialImages]);
 
   return (
     <div>
@@ -35,10 +41,11 @@ const SingleUpload = ({
           onPreview={(file) => {
             setPreviewImage({
               visible: true,
-              image: URL.createObjectURL(file?.originFileObj),
+              image: file?.url || URL.createObjectURL(file?.originFileObj),
             });
           }}
           beforeUpload={() => false}
+          className="custom-upload"
         >
           {children}
         </Upload>

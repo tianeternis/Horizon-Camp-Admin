@@ -1,23 +1,41 @@
-import { createNewBrand } from "@/services/brandService";
+import { editBrand, getBrand } from "@/services/brandService";
 import StatusCodes from "@/utils/status/StatusCodes";
 import { Modal } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BrandForm from "./BrandForm";
 import { toast } from "react-toastify";
 
-const FORM_NAME = "add-brand-form";
+const FORM_NAME = "edit-brand-form";
 
-const AddBrandModal = ({
+const EditBrandModal = ({
   open = false,
   handleClose = () => {},
+  brandID = null,
   refetch = () => {},
 }) => {
   const [loading, setLoading] = useState(false);
+  const [brand, setBrand] = useState(null);
+
+  useEffect(() => {
+    const fetchBrand = async () => {
+      const res = await getBrand(brandID);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        setBrand({ ...res.DT, image: res.DT?.image?.path });
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+    };
+
+    fetchBrand();
+  }, []);
 
   const handleSave = async (data) => {
-    if (data) {
+    if (data && brandID) {
       setLoading(true);
-      const res = await createNewBrand(data);
+      const res = await editBrand(brandID, data);
       setLoading(false);
 
       if (res && res.EC === StatusCodes.SUCCESS) {
@@ -34,7 +52,7 @@ const AddBrandModal = ({
 
   return (
     <Modal
-      title="Thêm thương hiệu"
+      title={`Chỉnh sửa thương hiệu${brand ? ` ${brand?.name}` : ""}`}
       open={open}
       onCancel={handleClose}
       maskClosable={false}
@@ -52,9 +70,13 @@ const AddBrandModal = ({
         disabled: loading,
       }}
     >
-      <BrandForm name={FORM_NAME} handleSave={handleSave} />
+      <BrandForm
+        name={FORM_NAME}
+        edit={{ editable: true, initialValue: brand }}
+        handleSave={handleSave}
+      />
     </Modal>
   );
 };
 
-export default AddBrandModal;
+export default EditBrandModal;
