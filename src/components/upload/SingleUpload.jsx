@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 
 const SingleUpload = ({
   name,
+  label = <></>,
   form,
   rules = [],
   accept = "image/*",
   listType = "picture",
-  initialImages = [],
+  initialImages,
   children,
 }) => {
   const [images, setImages] = useState([]);
@@ -18,12 +19,14 @@ const SingleUpload = ({
   });
 
   useEffect(() => {
-    setImages(initialImages);
+    if (initialImages) {
+      setImages(initialImages);
+    }
   }, [initialImages]);
 
   return (
     <div>
-      <Form.Item name={name} rules={rules} noStyle>
+      <Form.Item label={label} name={name} rules={rules}>
         <Upload
           accept={accept}
           listType={listType}

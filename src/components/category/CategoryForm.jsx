@@ -1,6 +1,6 @@
 import "@/assets/css/scrollbar.css";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, Select } from "antd";
 import { useEffect, useState } from "react";
 import SingleUpload from "../upload/SingleUpload";
 
@@ -10,7 +10,7 @@ const INPUT_NAME = {
   IMAGE: "image",
 };
 
-const BrandForm = ({
+const CategoryForm = ({
   name = "",
   handleSave = (data) => {},
   edit = { editable: false, initialValue: null },
@@ -53,17 +53,15 @@ const BrandForm = ({
     >
       <Form.Item
         name={INPUT_NAME.NAME}
-        label="Tên thương hiệu"
-        rules={[{ required: true, message: "Vui lòng nhập tên thương hiệu!" }]}
+        label="Tên danh mục"
+        rules={[{ required: true, message: "Vui lòng nhập tên danh mục!" }]}
       >
         <Input onBlur={() => form.validateFields([INPUT_NAME.NAME])} />
       </Form.Item>
       <Form.Item
         name={INPUT_NAME.DESCRIPTION}
-        label="Mô tả thương hiệu"
-        rules={[
-          { required: true, message: "Vui lòng nhập mô tả thương hiệu!" },
-        ]}
+        label="Mô tả danh mục"
+        rules={[{ required: true, message: "Vui lòng nhập mô tả danh mục!" }]}
       >
         <Input.TextArea
           rows={4}
@@ -80,7 +78,7 @@ const BrandForm = ({
           rules={[
             {
               required: true,
-              message: "Vui lòng tải lên hình ảnh thương hiệu!",
+              message: "Vui lòng tải lên hình ảnh danh mục!",
             },
           ]}
           initialImages={initialImages}
@@ -92,4 +90,4 @@ const BrandForm = ({
   );
 };
 
-export default BrandForm;
+export default CategoryForm;
