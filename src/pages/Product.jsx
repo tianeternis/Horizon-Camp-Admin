@@ -13,7 +13,7 @@ import { HiOutlinePlusCircle, HiSquaresPlus } from "react-icons/hi2";
 import { FiEye } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import AddProductModal from "@/components/product/AddProductModal";
+import AddProductModal from "@/components/product/modal/AddProductModal";
 
 const columns = [
   {

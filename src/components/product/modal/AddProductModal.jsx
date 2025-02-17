@@ -3,7 +3,7 @@ import StatusCodes from "@/utils/status/StatusCodes";
 import { Modal } from "antd";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import ProductForm from "./ProductForm";
+import ProductForm from "../form/ProductForm";
 
 const FORM_NAME = "add-product-form";
 
