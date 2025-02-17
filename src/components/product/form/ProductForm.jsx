@@ -22,10 +22,12 @@ import dayjs from "dayjs";
 import AddColorModal from "../modal/AddColorModal";
 import AddSizeModal from "../modal/AddSizeModal";
 import { getColors, getSizes } from "@/services/variantService";
+import { getBrands } from "@/services/brandService";
 
 const INPUT_NAME = {
   NAME: "name",
   CATEGORY: "category",
+  BRAND: "brand",
   DESCRIPTION: "description",
   DISCOUNT: "discount",
   DISCOUNT_START_DATE: "discountStartDate",
@@ -51,7 +53,9 @@ const ProductForm = ({
   const [form] = Form.useForm();
 
   const [initialImages, setInitialImages] = useState([]);
+
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [coloroptions, setColorOptions] = useState([]);
   const [sizeOptions, setSizeOptions] = useState([]);
 
@@ -83,7 +87,16 @@ const ProductForm = ({
       }
     };
 
+    const fetchBrands = async () => {
+      const res = await getBrands();
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        setBrands(res.DT?.data);
+      }
+    };
+
     fetchCategories();
+    fetchBrands();
     fetchColors();
     fetchSizes();
   }, []);
@@ -142,32 +155,64 @@ const ProductForm = ({
             >
               <Input onBlur={() => form.validateFields([INPUT_NAME.NAME])} />
             </Form.Item>
-            <Form.Item
-              name={INPUT_NAME.CATEGORY}
-              label="Danh mục sản phẩm"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn một danh mục sản phẩm!",
-                },
-              ]}
-            >
-              <Select
-                placeholder="Chọn danh mục sản phẩm"
-                showSearch
-                optionFilterProp="children"
-              >
-                {categories.length > 0 &&
-                  categories.map((category, i) => (
-                    <Select.Option
-                      key={`product-form-category-selection-option-${i}-${category?._id}`}
-                      value={category?._id}
-                    >
-                      {category?.name}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
+            <div className="flex gap-4">
+              <div className="w-1/2">
+                <Form.Item
+                  name={INPUT_NAME.CATEGORY}
+                  label="Danh mục sản phẩm"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng chọn một danh mục!",
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn danh mục sản phẩm"
+                    showSearch
+                    optionFilterProp="children"
+                  >
+                    {categories.length > 0 &&
+                      categories.map((category, i) => (
+                        <Select.Option
+                          key={`product-form-category-selection-option-${i}-${category?._id}`}
+                          value={category?._id}
+                        >
+                          {category?.name}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </div>
+              <div className="w-1/2">
+                <Form.Item
+                  name={INPUT_NAME.BRAND}
+                  label="Thương hiệu sản phẩm"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng chọn một thương hiệu!",
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn thương hiệu sản phẩm"
+                    showSearch
+                    optionFilterProp="children"
+                  >
+                    {brands.length > 0 &&
+                      brands.map((brand, i) => (
+                        <Select.Option
+                          key={`product-form-brand-selection-option-${i}-${brand?._id}`}
+                          value={brand?._id}
+                        >
+                          {brand?.name}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
             <Form.Item
               name={INPUT_NAME.DESCRIPTION}
               label="Mô tả sản phẩm"
@@ -176,7 +221,7 @@ const ProductForm = ({
               ]}
             >
               <Input.TextArea
-                rows={5}
+                rows={6}
                 spellCheck={false}
                 onBlur={() => form.validateFields([INPUT_NAME.DESCRIPTION])}
                 className="custom-scrollbar"
@@ -255,8 +300,8 @@ const ProductForm = ({
                           form.validateFields([INPUT_NAME.DISCOUNT_START_DATE])
                         }
                         disabled={
-                          getFieldValue(INPUT_NAME.DISCOUNT) === 0 ||
-                          getFieldValue(INPUT_NAME.DISCOUNT) === null
+                          !getFieldValue(INPUT_NAME.DISCOUNT) ||
+                          getFieldValue(INPUT_NAME.DISCOUNT) === 0
                         }
                       />
                     </Form.Item>
@@ -339,8 +384,8 @@ const ProductForm = ({
                           form.validateFields([INPUT_NAME.DISCOUNT_END_DATE])
                         }
                         disabled={
+                          !getFieldValue(INPUT_NAME.DISCOUNT) ||
                           getFieldValue(INPUT_NAME.DISCOUNT) === 0 ||
-                          getFieldValue(INPUT_NAME.DISCOUNT) === null ||
                           getFieldValue(INPUT_NAME.DISCOUNT_START_DATE) === null
                         }
                       />
@@ -427,8 +472,42 @@ const ProductForm = ({
             )}
           </Form.List>
         </Form.Item>
-        <Form.Item label="Các biến thể sản phẩm">
-          <Form.List name={INPUT_NAME.VARIANTS}>
+        <Form.Item
+          label="Các biến thể sản phẩm"
+          name={INPUT_NAME.VARIANTS}
+          rules={[
+            ({ getFieldValue }) => {
+              const value = getFieldValue(INPUT_NAME.VARIANTS);
+              return {
+                validator() {
+                  if (!value || value.length === 0) {
+                    return Promise.reject(
+                      "Vui lòng tạo ít nhất là 1 biến thế!",
+                    );
+                  }
+
+                  return Promise.resolve();
+                },
+              };
+            },
+          ]}
+        >
+          <Form.List
+            name={INPUT_NAME.VARIANTS}
+            rules={[
+              {
+                validator(_, value) {
+                  if (!value || value.length === 0) {
+                    return Promise.reject(
+                      "Vui lòng tạo ít nhất là 1 biến thế!",
+                    );
+                  }
+
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
             {(fields, { add, remove }) => (
               <div className="grid grid-cols-12 gap-6">
                 {fields.map((field) => (
@@ -533,9 +612,8 @@ const ProductForm = ({
                                             );
                                           }
                                           if (
-                                            (validatorPrice === 0 ||
-                                              validatorPrice === null ||
-                                              validatorPrice === undefined) &&
+                                            (!validatorPrice ||
+                                              validatorPrice === 0) &&
                                             value
                                           ) {
                                             return Promise.reject(
@@ -559,11 +637,7 @@ const ProductForm = ({
                                         current < dayjs().startOf("day")
                                       );
                                     }}
-                                    disabled={
-                                      price === 0 ||
-                                      price === undefined ||
-                                      price === null
-                                    }
+                                    disabled={!price || price === 0}
                                   />
                                 </Form.Item>
                               );
@@ -653,7 +727,9 @@ const ProductForm = ({
                 <div className="col-span-2">
                   <Button
                     type="dashed"
-                    onClick={() => add()}
+                    onClick={() => {
+                      add();
+                    }}
                     block
                     icon={<PlusOutlined />}
                   >
