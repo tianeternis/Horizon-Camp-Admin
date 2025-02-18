@@ -2,18 +2,38 @@ import { useDynamicTitle } from "@/hooks";
 import { PAGE_SIZE } from "@/constants";
 import ManagementContentLayout from "@/layouts/ManagementContentLayout";
 import ManagementDataTable from "@/components/table/ManagementDataTable";
-import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
-import AddCategoryModal from "@/components/category/AddCategoryModal";
-import EditCategoryModal from "@/components/category/EditCategoryModal";
-import { getCategories } from "@/services/categoryService";
 import StatusCodes from "@/utils/status/StatusCodes";
-import { Image } from "antd";
+import { Image, Tag } from "antd";
 import { BiEditAlt } from "react-icons/bi";
-import { HiOutlinePlusCircle, HiSquaresPlus } from "react-icons/hi2";
+import { HiOutlinePlusCircle } from "react-icons/hi2";
 import { FiEye } from "react-icons/fi";
+import { MdOutlineFilterAlt } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import AddProductModal from "@/components/product/modal/AddProductModal";
+import { getProductsForAdmin } from "@/services/productService";
+import { formatCurrency } from "@/utils/format/currency";
+
+const FILTER_KEY = {
+  status: "status",
+};
+
+const statuses = [
+  { key: "all", label: "Tất cả" },
+  { key: "visible", label: "Hiển thị sản phẩm" },
+  { key: "invisible", label: "Ẩn sản phẩm" },
+];
+
+const sorts = [
+  { key: "newest", label: "Sản phẩm mới nhất" },
+  { key: "oldest", label: "Sản phẩm cũ nhất" },
+];
+
+const DEFAULT_FILTER = {
+  [FILTER_KEY.status]: statuses[0],
+};
+
+const DEFAULT_SORT = sorts[0];
 
 const columns = [
   {
@@ -29,7 +49,7 @@ const columns = [
     title: "Tên sản phẩm",
     dataIndex: "name",
     align: "center",
-    width: "15%",
+    // width: "15%",
     render: (value) => <div className="text-center font-semibold">{value}</div>,
   },
   {
@@ -39,30 +59,63 @@ const columns = [
     align: "center",
   },
   {
+    key: "brand",
+    title: "Thương hiệu",
+    dataIndex: "brand",
+    align: "center",
+    width: 100,
+    render: (_, record) => <Image src={record?.brand} />,
+  },
+  {
     key: "price",
     title: "Giá bán",
     dataIndex: "price",
     align: "center",
+    render: (_, { variants }) => {
+      const first = variants[0]?.price;
+      const last = variants[variants?.length - 1]?.price;
+
+      return (
+        <span>
+          {formatCurrency(first)}
+          {first !== last ? ` - ${formatCurrency(last)}` : ""}
+        </span>
+      );
+    },
   },
   {
     key: "discount",
     title: "Chiết khấu",
     dataIndex: "discount",
     align: "center",
+    width: 95,
+    render: (value) =>
+      value ? (
+        <Tag color="pink" style={{ margin: 0 }}>
+          {value}%
+        </Tag>
+      ) : (
+        <Tag color="gold" style={{ margin: 0 }}>
+          Không có
+        </Tag>
+      ),
   },
   {
     key: "status",
     title: "Trạng thái",
     dataIndex: "status",
     align: "center",
-  },
-  {
-    key: "createdAt",
-    title: "Ngày tạo",
-    dataIndex: "createdAt",
-    align: "center",
-    width: 140,
-    render: (createdAt) => formatDateToHHMMDDMMYYYY(createdAt),
+    width: 95,
+    render: (_, { visible }) =>
+      visible ? (
+        <Tag color="lime" style={{ margin: 0 }}>
+          HIỂN THỊ
+        </Tag>
+      ) : (
+        <Tag color="red" style={{ margin: 0 }}>
+          ẨN
+        </Tag>
+      ),
   },
 ];
 
@@ -71,24 +124,103 @@ const Product = ({}) => {
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyWords, setSearchKeyWords] = useState("");
+  const [filter, setFilter] = useState(DEFAULT_FILTER);
+  const [sort, setSort] = useState(DEFAULT_SORT);
+
   const [loading, setLoading] = useState(false);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editModal, setEditModal] = useState({ show: false, data: null });
 
+  const fetchProducts = async (search, page, limit, status, sort) => {
+    setLoading(true);
+
+    const res = await getProductsForAdmin(search, page, limit, status, sort);
+
+    if (res && res.EC === StatusCodes.SUCCESS) {
+      const data = res.DT?.data || [];
+
+      const newData = data?.map((item) => ({
+        ...item,
+        key: item?._id,
+      }));
+
+      setDataSource(newData);
+      setTotalPages(res.DT?.pagination?.total);
+    }
+
+    if (res && res.EC === StatusCodes.ERRROR) {
+      toast.error(res.EM);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts(
+      searchKeyWords,
+      currentPage,
+      PAGE_SIZE,
+      filter[FILTER_KEY.status]?.key,
+      sort?.key,
+    );
+  }, []);
+
+  const handleSelectFilter = async (filterKey, value) => {
+    setFilter((prev) => ({ ...prev, [filterKey]: value }));
+    setCurrentPage(1);
+    await fetchProducts(searchKeyWords, 1, PAGE_SIZE, value?.key, sort?.key);
+  };
+
   const handleChangePage = async (page) => {
     setCurrentPage(page);
+    await fetchProducts(
+      searchKeyWords,
+      currentPage,
+      PAGE_SIZE,
+      filter[FILTER_KEY.status]?.key,
+      sort?.key,
+    );
+  };
+
+  const handleSelectSort = async (value) => {
+    setSort(value);
+    setCurrentPage(1);
+    await fetchProducts(
+      searchKeyWords,
+      1,
+      PAGE_SIZE,
+      filter?.[FILTER_KEY.status]?.key,
+      value?.key,
+    );
   };
 
   const handleSearch = async () => {
     setCurrentPage(1);
+    await fetchProducts(
+      searchKeyWords,
+      1,
+      PAGE_SIZE,
+      filter[FILTER_KEY.status]?.key,
+      sort?.key,
+    );
   };
 
   const handleReset = async () => {
     setCurrentPage(1);
     setSearchKeyWords("");
+    setFilter(DEFAULT_FILTER);
+    setSort(DEFAULT_SORT);
+    await fetchProducts(
+      "",
+      currentPage,
+      PAGE_SIZE,
+      DEFAULT_FILTER?.[FILTER_KEY.status]?.key,
+      DEFAULT_SORT?.key,
+    );
   };
 
   return (
@@ -113,11 +245,35 @@ const Product = ({}) => {
             pageSize: PAGE_SIZE,
             showTotal: (total) => `Tổng sản phẩm: ${total}`,
           }}
+          filterMenu={{
+            hasFilterMenu: true,
+            menu: [
+              {
+                title: "Chọn trạng thái",
+                icon: <MdOutlineFilterAlt />,
+                menuItems: statuses,
+                selectedKey: filter?.[FILTER_KEY.status],
+                setSelectedKey: (value) =>
+                  handleSelectFilter(FILTER_KEY.status, value),
+              },
+            ],
+          }}
+          sortMenu={{
+            hasSortMenu: true,
+            menu: [
+              {
+                title: "Sắp xếp",
+                menuItems: sorts,
+                selectedKey: sort,
+                setSelectedKey: (value) => handleSelectSort(value),
+              },
+            ],
+          }}
           search={{
             hasSearchInput: true,
             value: searchKeyWords,
             setValue: setSearchKeyWords,
-            placeholder: "Tìm kiếm theo Mã hoặc Tên sản phẩm",
+            placeholder: "Tìm kiếm theo Tên sản phẩm",
             width: 360,
             onSubmit: () => handleSearch(),
           }}
@@ -146,7 +302,7 @@ const Product = ({}) => {
                 onClick: (data) => setEditModal({ show: true, data }),
               },
             ],
-            widthColumn: 80,
+            widthColumn: 90,
           }}
         />
       </ManagementContentLayout>

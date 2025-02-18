@@ -26,13 +26,13 @@ import { getBrands } from "@/services/brandService";
 
 const INPUT_NAME = {
   NAME: "name",
-  CATEGORY: "category",
-  BRAND: "brand",
+  CATEGORY: "categoryID",
+  BRAND: "brandID",
   DESCRIPTION: "description",
   DISCOUNT: "discount",
   DISCOUNT_START_DATE: "discountStartDate",
   DISCOUNT_END_DATE: "discountEndDate",
-  IMAGE: "image",
+  IMAGE: "images",
   VISIBLE: "visible",
   ATTRIBUTES: "attributes",
   ATTRIBUTE_NAME: "name",
@@ -41,14 +41,14 @@ const INPUT_NAME = {
   QUANTITY: "quantity",
   PRICE: "price",
   PRICE_APPLIED_DATE: "priceAppliedDate",
-  COLOR: "color",
-  SIZE: "size",
+  COLOR: "colorID",
+  SIZE: "sizeID",
 };
 
 const ProductForm = ({
   name = "",
   handleSave = (data) => {},
-  edit = { editable: false, initialValue: null },
+  // edit = { editable: false, initialValue: null },
 }) => {
   const [form] = Form.useForm();
 
@@ -101,24 +101,24 @@ const ProductForm = ({
     fetchSizes();
   }, []);
 
-  useEffect(() => {
-    if (edit && edit.editable && edit.initialValue) {
-      const values = edit?.initialValue;
-      form.setFieldsValue({
-        [INPUT_NAME.NAME]: values?.name,
-        [INPUT_NAME.DESCRIPTION]: values?.description,
-        [INPUT_NAME.IMAGE]: values?.image,
-      });
-      setInitialImages([
-        {
-          uid: "-1",
-          name: `${values?.name}.png`,
-          status: "done",
-          url: values?.image,
-        },
-      ]);
-    }
-  }, [edit.initialValue]);
+  // useEffect(() => {
+  //   if (edit && edit.editable && edit.initialValue) {
+  //     const values = edit?.initialValue;
+  //     form.setFieldsValue({
+  //       [INPUT_NAME.NAME]: values?.name,
+  //       [INPUT_NAME.DESCRIPTION]: values?.description,
+  //       [INPUT_NAME.IMAGE]: values?.image,
+  //     });
+  //     setInitialImages([
+  //       {
+  //         uid: "-1",
+  //         name: `${values?.name}.png`,
+  //         status: "done",
+  //         url: values?.image,
+  //       },
+  //     ]);
+  //   }
+  // }, [edit.initialValue]);
 
   const onFinish = (values) => {
     handleSave(values);

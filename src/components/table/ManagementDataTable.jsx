@@ -2,6 +2,7 @@ import "@/assets/css/scrollbar.css";
 import DataDisplayOptions from "./options/DataDisplayOptions";
 import FilterMenu from "./filter/FilterMenu";
 import SearchInput from "./search/SearchInput";
+import SortMenu from "./sort/SortMenu";
 import { Empty, Table, Tooltip } from "antd";
 import { Fragment, useMemo, useState } from "react";
 import { BUTTON_HEIGHT } from "./constants";
@@ -38,6 +39,18 @@ const DEFAULT_FILTER_MENU = {
     {
       title: "Example",
       icon: <></>,
+      menuItems: [{ key: "example", label: "Example" }],
+      selectedKey: {},
+      setSelectedKey: (value) => {},
+    },
+  ],
+};
+
+const DEFAULT_SORT_MENU = {
+  hasSortMenu: false,
+  menu: [
+    {
+      title: "Example",
       menuItems: [{ key: "example", label: "Example" }],
       selectedKey: {},
       setSelectedKey: (value) => {},
@@ -83,6 +96,7 @@ const ManagementDataTable = ({
   table = DEFAULT_TABLE,
   pagination = DEFAULT_PAGINATION,
   filterMenu = DEFAULT_FILTER_MENU,
+  sortMenu = DEFAULT_SORT_MENU,
   search = DEFAULT_SEARCH,
   reset = { hasResetButton: false, onClick: () => {} },
   crudButton = DEFAULT_CRUD_BUTTON,
@@ -191,6 +205,17 @@ const ManagementDataTable = ({
                 menuItems={filter?.menuItems}
                 selectedKey={filter?.selectedKey}
                 setSelectedKey={filter?.setSelectedKey}
+              />
+            ))}
+          {sortMenu?.hasSortMenu &&
+            sortMenu?.menu?.length > 0 &&
+            sortMenu?.menu?.map((sort, i) => (
+              <SortMenu
+                key={`data-table-sort-menu-for-${sort?.title}-${i}`}
+                title={sort?.title}
+                menuItems={sort?.menuItems}
+                selectedKey={sort?.selectedKey}
+                setSelectedKey={sort?.setSelectedKey}
               />
             ))}
           {search?.hasSearchInput && (

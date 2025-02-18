@@ -4,6 +4,7 @@ import { Modal } from "antd";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ProductForm from "../form/ProductForm";
+import { createNewProduct } from "@/services/productService";
 
 const FORM_NAME = "add-product-form";
 
@@ -15,21 +16,21 @@ const AddProductModal = ({
   const [loading, setLoading] = useState(false);
 
   const handleSave = async (data) => {
-    console.log(data);
+    if (data) {
+      setLoading(true);
+      const res = await createNewProduct(data);
+      setLoading(false);
 
-    // if (data) {
-    //   setLoading(true);
-    //   const res = await createNewCategory(data);
-    //   setLoading(false);
-    //   if (res && res.EC === StatusCodes.SUCCESS) {
-    //     toast.success(res.EM);
-    //     handleClose();
-    //     refetch();
-    //   }
-    //   if (res && res.EC === StatusCodes.ERRROR) {
-    //     toast.error(res.EM);
-    //   }
-    // }
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        handleClose();
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+    }
   };
 
   return (
