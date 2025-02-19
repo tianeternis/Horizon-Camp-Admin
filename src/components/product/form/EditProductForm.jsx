@@ -18,7 +18,6 @@ import { useEffect, useState } from "react";
 import { getCategories } from "@/services/categoryService";
 import StatusCodes from "@/utils/status/StatusCodes";
 import MultipleUpload from "../../upload/MultipleUpload";
-import dayjs from "dayjs";
 import AddColorModal from "../modal/AddColorModal";
 import AddSizeModal from "../modal/AddSizeModal";
 import { getColors, getSizes } from "@/services/variantService";
@@ -29,9 +28,6 @@ const INPUT_NAME = {
   CATEGORY: "categoryID",
   BRAND: "brandID",
   DESCRIPTION: "description",
-  DISCOUNT: "discount",
-  DISCOUNT_START_DATE: "discountStartDate",
-  DISCOUNT_END_DATE: "discountEndDate",
   IMAGE: "images",
   VISIBLE: "visible",
   ATTRIBUTES: "attributes",
@@ -60,6 +56,9 @@ const EditProductForm = ({
 
   const [showAddColorModal, setShowAddColorModal] = useState(false);
   const [showAddSizeModal, setShowAddSizeModal] = useState(false);
+
+  const [addedImages, setAddedImages] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
 
   const fetchColors = async () => {
     const res = await getColors();
@@ -108,7 +107,6 @@ const EditProductForm = ({
         brand,
         description,
         visible,
-        discount,
         images,
         attributes,
         variants,
@@ -117,10 +115,11 @@ const EditProductForm = ({
       const defaultImages =
         images && images?.length > 0
           ? images?.map((img) => ({
-              uid: img?._id,
+              uid: img?.image?._id,
               name: `${img?.image?.fileName}.png`,
               status: "done",
               url: img?.image?.path,
+              productImageID: img?._id,
             }))
           : [];
       setInitialImages(defaultImages);
@@ -145,20 +144,12 @@ const EditProductForm = ({
             }))
           : [];
 
-      const discountStartDate =
-        discount && discount?.startDate ? dayjs(discount?.startDate) : null;
-      const discountEndDate =
-        discount && discount?.endDate ? dayjs(discount?.endDate) : null;
-
       form.setFieldsValue({
         [INPUT_NAME.VISIBLE]: visible,
         [INPUT_NAME.NAME]: name,
         [INPUT_NAME.DESCRIPTION]: description,
         [INPUT_NAME.CATEGORY]: category?._id,
         [INPUT_NAME.BRAND]: brand?._id,
-        [INPUT_NAME.DISCOUNT]: discount ? discount?.value : 0,
-        [INPUT_NAME.DISCOUNT_START_DATE]: discountStartDate,
-        [INPUT_NAME.DISCOUNT_END_DATE]: discountEndDate,
         [INPUT_NAME.IMAGE]: images?.map((img) => img?.image?.path),
         [INPUT_NAME.ATTRIBUTES]: defaultAttributes,
         [INPUT_NAME.VARIANTS]: defaultVariants,
@@ -166,8 +157,30 @@ const EditProductForm = ({
     }
   }, [initialValues]);
 
+  const handleChangeImage = (file) => {
+    setAddedImages((prev) => [...prev, file]);
+  };
+
+  const handleRemoveImage = (file) => {
+    if (file && file.uid && file.productImageID && file.name) {
+      setRemovedImages((prev) => [
+        ...prev,
+        {
+          imageID: file.uid,
+          productImageID: file.productImageID,
+          imageFileName: file.name,
+        },
+      ]);
+    } else {
+      setAddedImages((prev) => {
+        const newImages = prev?.filter((item) => item?.uid !== file?.uid);
+        return newImages;
+      });
+    }
+  };
+
   const onFinish = (values) => {
-    handleSave(values);
+    handleSave({ ...values, addedImages, removedImages });
   };
 
   return (
@@ -191,7 +204,7 @@ const EditProductForm = ({
               <Checkbox>Hiển thị sản phẩm này</Checkbox>
             </Form.Item>
           </div>
-          <div className="col-span-5">
+          <div className="col-span-6">
             <Form.Item
               name={INPUT_NAME.NAME}
               label="Tên sản phẩm"
@@ -274,172 +287,7 @@ const EditProductForm = ({
               />
             </Form.Item>
           </div>
-          <div className="col-span-7">
-            <div className="flex items-center gap-4">
-              <div className="w-1/3">
-                <Form.Item
-                  name={INPUT_NAME.DISCOUNT}
-                  label="Giảm giá (%)"
-                  rules={[
-                    {
-                      type: "number",
-                      min: 0,
-                      max: 100,
-                      message: "Giá trị giảm giá phải từ 0% đến 100%",
-                    },
-                  ]}
-                  initialValue={0}
-                >
-                  <InputNumber
-                    min={0}
-                    max={100}
-                    addonAfter="%"
-                    onBlur={() => form.validateFields([INPUT_NAME.DISCOUNT])}
-                    style={{ width: "100%" }}
-                  />
-                </Form.Item>
-              </div>
-              <div className="w-1/3">
-                <Form.Item dependencies={[INPUT_NAME.DISCOUNT]} noStyle>
-                  {({ getFieldValue }) => (
-                    <Form.Item
-                      name={INPUT_NAME.DISCOUNT_START_DATE}
-                      label="Ngày bắt đầu giảm giá"
-                      rules={[
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (
-                              getFieldValue(INPUT_NAME.DISCOUNT) > 0 &&
-                              !value
-                            ) {
-                              return Promise.reject(
-                                "Vui lòng nhập ngày bắt đầu!",
-                              );
-                            }
-                            if (dayjs(value).isBefore(dayjs(), "day")) {
-                              return Promise.reject(
-                                "Ngày bắt đầu phải lớn hơn ngày hiện tại!",
-                              );
-                            }
-                            if (
-                              getFieldValue(INPUT_NAME.DISCOUNT) === 0 &&
-                              value
-                            ) {
-                              return Promise.reject(
-                                "Không được chọn ngày khi không có giảm giá!",
-                              );
-                            }
-                            return Promise.resolve();
-                          },
-                        }),
-                      ]}
-                      initialValue={null}
-                    >
-                      <DatePicker
-                        style={{ width: "100%" }}
-                        format={"DD/MM/YYYY"}
-                        placeholder="Chọn ngày"
-                        disabledDate={(current) => {
-                          return current && current < dayjs().startOf("day");
-                        }}
-                        onBlur={() =>
-                          form.validateFields([INPUT_NAME.DISCOUNT_START_DATE])
-                        }
-                        disabled={
-                          !getFieldValue(INPUT_NAME.DISCOUNT) ||
-                          getFieldValue(INPUT_NAME.DISCOUNT) === 0
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </Form.Item>
-              </div>
-              <div className="w-1/3">
-                <Form.Item
-                  dependencies={[
-                    INPUT_NAME.DISCOUNT,
-                    INPUT_NAME.DISCOUNT_START_DATE,
-                  ]}
-                  noStyle
-                >
-                  {({ getFieldValue }) => (
-                    <Form.Item
-                      name={INPUT_NAME.DISCOUNT_END_DATE}
-                      label="Ngày kết thúc giảm giá"
-                      rules={[
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (
-                              getFieldValue(INPUT_NAME.DISCOUNT) > 0 &&
-                              !value
-                            ) {
-                              return Promise.reject(
-                                "Vui lòng nhập ngày kết thúc!",
-                              );
-                            }
-                            if (
-                              getFieldValue(INPUT_NAME.DISCOUNT) === 0 &&
-                              value
-                            ) {
-                              return Promise.reject(
-                                "Không được chọn ngày khi không có giảm giá!",
-                              );
-                            }
-                            if (
-                              getFieldValue(INPUT_NAME.DISCOUNT_START_DATE) &&
-                              (dayjs(value).isBefore(
-                                dayjs(
-                                  getFieldValue(INPUT_NAME.DISCOUNT_START_DATE),
-                                ),
-                                "day",
-                              ) ||
-                                dayjs(value).isSame(
-                                  dayjs(
-                                    getFieldValue(
-                                      INPUT_NAME.DISCOUNT_START_DATE,
-                                    ),
-                                  ),
-                                  "day",
-                                ))
-                            ) {
-                              return Promise.reject(
-                                "Ngày kết thúc phải lớn hơn ngày bắt đầu!",
-                              );
-                            }
-                            return Promise.resolve();
-                          },
-                        }),
-                      ]}
-                      initialValue={null}
-                    >
-                      <DatePicker
-                        style={{ width: "100%" }}
-                        format={"DD/MM/YYYY"}
-                        placeholder="Chọn ngày"
-                        disabledDate={(current) => {
-                          const startDate = form.getFieldValue(
-                            INPUT_NAME.DISCOUNT_START_DATE,
-                          );
-                          return (
-                            current &&
-                            (!current.isAfter(dayjs(startDate), "day") ||
-                              !current.isAfter(dayjs(), "day"))
-                          );
-                        }}
-                        onBlur={() =>
-                          form.validateFields([INPUT_NAME.DISCOUNT_END_DATE])
-                        }
-                        disabled={
-                          !getFieldValue(INPUT_NAME.DISCOUNT) ||
-                          getFieldValue(INPUT_NAME.DISCOUNT) === 0 ||
-                          getFieldValue(INPUT_NAME.DISCOUNT_START_DATE) === null
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </Form.Item>
-              </div>
-            </div>
+          <div className="col-span-6">
             <Form.Item noStyle>
               <MultipleUpload
                 label="Hình ảnh"
@@ -454,6 +302,8 @@ const EditProductForm = ({
                 listType="picture-card"
                 maxCount={10}
                 initialImages={initialImages}
+                handleChangeImage={handleChangeImage}
+                handleRemoveImage={handleRemoveImage}
               >
                 <button type="button" className="border-0 bg-none">
                   <PlusOutlined />
@@ -743,6 +593,7 @@ const EditProductForm = ({
           </Form.List>
         </Form.Item>
       </Form>
+
       {showAddColorModal && (
         <AddColorModal
           open={showAddColorModal}

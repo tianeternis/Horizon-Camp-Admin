@@ -50,7 +50,6 @@ const columns = [
     title: "Tên sản phẩm",
     dataIndex: "name",
     align: "center",
-    // width: "15%",
     render: (value) => <div className="text-center font-semibold">{value}</div>,
   },
   {
@@ -86,10 +85,10 @@ const columns = [
   },
   {
     key: "discount",
-    title: "Chiết khấu",
+    title: "Chiết khấu đang áp dụng",
     dataIndex: "discount",
     align: "center",
-    width: 95,
+    width: 110,
     render: (value) =>
       value ? (
         <Tag color="pink" style={{ margin: 0 }}>
@@ -319,6 +318,15 @@ const Product = ({}) => {
           open={editModal.show}
           handleClose={() => setEditModal({ show: false, data: null })}
           productID={editModal.data?._id}
+          refetch={async () =>
+            await fetchProducts(
+              searchKeyWords,
+              currentPage,
+              PAGE_SIZE,
+              filter?.[FILTER_KEY.status]?.key,
+              sort?.key,
+            )
+          }
         />
       )}
     </div>

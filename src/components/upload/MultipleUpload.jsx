@@ -11,6 +11,8 @@ const MultipleUpload = ({
   accept = "image/*",
   listType = "picture",
   initialImages,
+  handleChangeImage,
+  handleRemoveImage,
   children,
 }) => {
   const [images, setImages] = useState([]);
@@ -34,11 +36,15 @@ const MultipleUpload = ({
           listType={listType}
           maxCount={maxCount}
           fileList={images}
-          onChange={({ fileList }) => {
+          onChange={({ fileList, file }) => {
             setImages(fileList);
             form.setFieldsValue({
               [name]: fileList.map((file) => file.originFileObj || file),
             });
+
+            if (handleChangeImage && typeof handleChangeImage === "function") {
+              handleChangeImage(file);
+            }
           }}
           onRemove={(file) => {
             const newFileList = images.filter((item) => item.uid !== file.uid);
@@ -46,6 +52,11 @@ const MultipleUpload = ({
             form.setFieldsValue({
               [name]: newFileList.map((file) => file.originFileObj || file),
             });
+
+            if (handleRemoveImage && typeof handleRemoveImage === "function") {
+              handleRemoveImage(file);
+            }
+
             return false;
           }}
           onPreview={(file) => {

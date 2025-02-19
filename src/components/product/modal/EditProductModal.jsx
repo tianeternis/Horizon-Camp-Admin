@@ -2,7 +2,11 @@ import StatusCodes from "@/utils/status/StatusCodes";
 import { Modal } from "antd";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { createNewProduct, getProductByID } from "@/services/productService";
+import {
+  createNewProduct,
+  editProduct,
+  getProductByID,
+} from "@/services/productService";
 import EditProductForm from "../form/EditProductForm";
 
 const FORM_NAME = "edit-product-form";
@@ -31,23 +35,89 @@ const EditProductModal = ({
   }, [productID]);
 
   const handleSave = async (data) => {
-    console.log(data);
+    if (data && productID) {
+      const { variants, attributes } = data;
 
-    // if (data) {
-    //   setLoading(true);
-    //   const res = await createNewProduct(data);
-    //   setLoading(false);
+      if (attributes && attributes?.length > 0) {
+        let addedAttributes = [];
+        let removedAttributes = [];
+        let editedAttributes = [];
 
-    //   if (res && res.EC === StatusCodes.SUCCESS) {
-    //     toast.success(res.EM);
-    //     handleClose();
-    //     refetch();
-    //   }
+        attributes?.forEach((item, i) => {
+          if (item?.add) {
+            addedAttributes.push(item);
+          } else if (item?.delete) {
+            removedAttributes.push(item);
+          } else {
+            const defaultAttribute = product?.attributes?.find(
+              (a) => a?._id === item?._id,
+            );
 
-    //   if (res && res.EC === StatusCodes.ERRROR) {
-    //     toast.error(res.EM);
-    //   }
-    // }
+            if (
+              defaultAttribute?.name !== item?.name ||
+              defaultAttribute?.value !== item?.value
+            ) {
+              editedAttributes.push(item);
+            }
+          }
+        });
+
+        data.attributes = {
+          add: addedAttributes,
+          remove: removedAttributes,
+          edit: editedAttributes,
+        };
+      }
+
+      if (variants && variants?.length > 0) {
+        const addedVariants = [];
+        const removedVariants = [];
+        const editedVariants = [];
+
+        variants?.forEach((item, i) => {
+          if (item?.add) {
+            addedVariants.push(item);
+          } else if (item?.delete) {
+            removedVariants.push(item);
+          } else {
+            const defaultVariant = product?.variants?.find(
+              (a) => a?._id === item?._id,
+            );
+
+            if (
+              defaultVariant?.quantity !== item?.quantity ||
+              defaultVariant?.price !== item?.price ||
+              defaultVariant?.color?._id !== item?.colorID ||
+              defaultVariant?.size?._id !== item?.sizeID
+            ) {
+              editedVariants.push(item);
+            }
+          }
+        });
+
+        data.variants = {
+          add: addedVariants,
+          remove: removedVariants,
+          edit: editedVariants,
+        };
+      }
+
+      setLoading(true);
+      const res = await editProduct(productID, data);
+      setLoading(false);
+
+      console.log(res);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        handleClose();
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+    }
   };
 
   return (

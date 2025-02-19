@@ -43,6 +43,39 @@ export const createNewProduct = ({
   return axios.post(`/product/create`, formData);
 };
 
+export const editProduct = (
+  id,
+  { images, addedImages, removedImages, attributes, variants, ...others },
+) => {
+  const formData = new FormData();
+
+  if (addedImages && addedImages?.length > 0) {
+    addedImages.forEach((image) => {
+      formData.append("addedImages", image);
+    });
+  }
+
+  if (removedImages && removedImages?.length > 0) {
+    formData.append("removedImages", JSON.stringify(removedImages));
+  }
+
+  if (attributes) {
+    formData.append("attributes", JSON.stringify(attributes));
+  }
+
+  if (variants) {
+    formData.append("variants", JSON.stringify(variants));
+  }
+
+  if (others) {
+    Object.entries(others).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+  }
+
+  return axios.put(`/product/edit/${id}`, formData);
+};
+
 export const getProductsForAdmin = (search, page, limit, status, sort) => {
   const params = new URLSearchParams();
 
