@@ -4,16 +4,7 @@ import {
   MinusCircleOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Checkbox,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-} from "antd";
+import { Button, Card, Checkbox, Form, Input, InputNumber, Select } from "antd";
 import { useEffect, useState } from "react";
 import { getCategories } from "@/services/categoryService";
 import StatusCodes from "@/utils/status/StatusCodes";
@@ -198,7 +189,6 @@ const EditProductForm = ({
             <Form.Item
               name={INPUT_NAME.VISIBLE}
               valuePropName="checked"
-              initialValue={true}
               noStyle
             >
               <Checkbox>Hiển thị sản phẩm này</Checkbox>

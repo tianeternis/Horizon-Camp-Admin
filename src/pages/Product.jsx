@@ -8,12 +8,15 @@ import { BiEditAlt } from "react-icons/bi";
 import { HiOutlinePlusCircle } from "react-icons/hi2";
 import { FiEye } from "react-icons/fi";
 import { MdOutlineFilterAlt } from "react-icons/md";
+import { RiCouponLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import AddProductModal from "@/components/product/modal/AddProductModal";
+import EditProductModal from "@/components/product/modal/EditProductModal";
+import ViewProductModal from "@/components/product/modal/ViewProductModal";
 import { getProductsForAdmin } from "@/services/productService";
 import { formatCurrency } from "@/utils/format/currency";
-import EditProductModal from "@/components/product/modal/EditProductModal";
+import ViewDiscountModal from "@/components/product/modal/ViewDiscountModal";
 
 const FILTER_KEY = {
   status: "status",
@@ -134,6 +137,11 @@ const Product = ({}) => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editModal, setEditModal] = useState({ show: false, data: null });
+  const [viewModal, setViewModal] = useState({ show: false, data: null });
+  const [viewDiscountModal, setViewDiscountModal] = useState({
+    show: false,
+    data: null,
+  });
 
   const fetchProducts = async (search, page, limit, status, sort) => {
     setLoading(true);
@@ -294,15 +302,20 @@ const Product = ({}) => {
               {
                 title: "Xem chi tiết",
                 icon: <FiEye className="text-blue-600" />,
-                onClick: (data) => console.log("Xem", data),
+                onClick: (data) => setViewModal({ show: true, data }),
               },
               {
                 title: "Chỉnh sửa",
                 icon: <BiEditAlt className="text-green-600" />,
                 onClick: (data) => setEditModal({ show: true, data }),
               },
+              {
+                title: "Xem thông tin chiết khấu",
+                icon: <RiCouponLine className="text-rose-600" />,
+                onClick: (data) => setViewDiscountModal({ show: true, data }),
+              },
             ],
-            widthColumn: 90,
+            widthColumn: 110,
           }}
         />
       </ManagementContentLayout>
@@ -327,6 +340,20 @@ const Product = ({}) => {
               sort?.key,
             )
           }
+        />
+      )}
+      {viewModal.show && (
+        <ViewProductModal
+          open={viewModal.show}
+          handleClose={() => setViewModal({ show: false, data: null })}
+          productID={viewModal.data?._id}
+        />
+      )}
+      {viewDiscountModal.show && (
+        <ViewDiscountModal
+          open={viewDiscountModal.show}
+          handleClose={() => setViewDiscountModal({ show: false, data: null })}
+          productID={viewDiscountModal.data?._id}
         />
       )}
     </div>
