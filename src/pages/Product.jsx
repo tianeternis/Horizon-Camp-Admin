@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import AddProductModal from "@/components/product/modal/AddProductModal";
 import { getProductsForAdmin } from "@/services/productService";
 import { formatCurrency } from "@/utils/format/currency";
+import EditProductModal from "@/components/product/modal/EditProductModal";
 
 const FILTER_KEY = {
   status: "status",
@@ -313,16 +314,13 @@ const Product = ({}) => {
           refetch={handleReset}
         />
       )}
-      {/* {editModal.show && (
-        <EditCategoryModal
+      {editModal.show && (
+        <EditProductModal
           open={editModal.show}
           handleClose={() => setEditModal({ show: false, data: null })}
-          categoryID={editModal.data?._id}
-          refetch={async () =>
-            await fetchCategories(searchKeyWords, currentPage, PAGE_SIZE)
-          }
+          productID={editModal.data?._id}
         />
-      )} */}
+      )}
     </div>
   );
 };

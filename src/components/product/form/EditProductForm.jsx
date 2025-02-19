@@ -40,15 +40,14 @@ const INPUT_NAME = {
   VARIANTS: "variants",
   QUANTITY: "quantity",
   PRICE: "price",
-  PRICE_APPLIED_DATE: "priceAppliedDate",
   COLOR: "colorID",
   SIZE: "sizeID",
 };
 
-const ProductForm = ({
+const EditProductForm = ({
   name = "",
   handleSave = (data) => {},
-  // edit = { editable: false, initialValue: null },
+  initialValues = null,
 }) => {
   const [form] = Form.useForm();
 
@@ -101,24 +100,71 @@ const ProductForm = ({
     fetchSizes();
   }, []);
 
-  // useEffect(() => {
-  //   if (edit && edit.editable && edit.initialValue) {
-  //     const values = edit?.initialValue;
-  //     form.setFieldsValue({
-  //       [INPUT_NAME.NAME]: values?.name,
-  //       [INPUT_NAME.DESCRIPTION]: values?.description,
-  //       [INPUT_NAME.IMAGE]: values?.image,
-  //     });
-  //     setInitialImages([
-  //       {
-  //         uid: "-1",
-  //         name: `${values?.name}.png`,
-  //         status: "done",
-  //         url: values?.image,
-  //       },
-  //     ]);
-  //   }
-  // }, [edit.initialValue]);
+  useEffect(() => {
+    if (initialValues) {
+      const {
+        name,
+        category,
+        brand,
+        description,
+        visible,
+        discount,
+        images,
+        attributes,
+        variants,
+      } = initialValues;
+
+      const defaultImages =
+        images && images?.length > 0
+          ? images?.map((img) => ({
+              uid: img?._id,
+              name: `${img?.image?.fileName}.png`,
+              status: "done",
+              url: img?.image?.path,
+            }))
+          : [];
+      setInitialImages(defaultImages);
+
+      const defaultAttributes =
+        attributes && attributes?.length > 0
+          ? attributes?.map((attribute) => ({
+              _id: attribute?._id,
+              [INPUT_NAME.ATTRIBUTE_NAME]: attribute?.name,
+              [INPUT_NAME.ATTRIBUTE_VALUE]: attribute?.value,
+            }))
+          : [];
+
+      const defaultVariants =
+        variants && variants?.length > 0
+          ? variants?.map((variant) => ({
+              _id: variant?._id,
+              [INPUT_NAME.QUANTITY]: variant?.quantity,
+              [INPUT_NAME.PRICE]: variant?.price,
+              [INPUT_NAME.COLOR]: variant?.color?._id,
+              [INPUT_NAME.SIZE]: variant?.size?._id,
+            }))
+          : [];
+
+      const discountStartDate =
+        discount && discount?.startDate ? dayjs(discount?.startDate) : null;
+      const discountEndDate =
+        discount && discount?.endDate ? dayjs(discount?.endDate) : null;
+
+      form.setFieldsValue({
+        [INPUT_NAME.VISIBLE]: visible,
+        [INPUT_NAME.NAME]: name,
+        [INPUT_NAME.DESCRIPTION]: description,
+        [INPUT_NAME.CATEGORY]: category?._id,
+        [INPUT_NAME.BRAND]: brand?._id,
+        [INPUT_NAME.DISCOUNT]: discount ? discount?.value : 0,
+        [INPUT_NAME.DISCOUNT_START_DATE]: discountStartDate,
+        [INPUT_NAME.DISCOUNT_END_DATE]: discountEndDate,
+        [INPUT_NAME.IMAGE]: images?.map((img) => img?.image?.path),
+        [INPUT_NAME.ATTRIBUTES]: defaultAttributes,
+        [INPUT_NAME.VARIANTS]: defaultVariants,
+      });
+    }
+  }, [initialValues]);
 
   const onFinish = (values) => {
     handleSave(values);
@@ -405,9 +451,9 @@ const ProductForm = ({
                     message: "Vui lòng tải lên hình ảnh sản phẩm!",
                   },
                 ]}
-                initialImages={initialImages}
                 listType="picture-card"
                 maxCount={10}
+                initialImages={initialImages}
               >
                 <button type="button" className="border-0 bg-none">
                   <PlusOutlined />
@@ -421,46 +467,68 @@ const ProductForm = ({
           <Form.List name={INPUT_NAME.ATTRIBUTES}>
             {(fields, { add, remove }) => (
               <div className="grid grid-cols-12 gap-x-6">
-                {fields.map(({ key, name, ...restField }) => (
-                  <div key={key} className="col-span-6">
-                    <div className="mb-2 flex gap-2 align-baseline">
-                      <Form.Item
-                        {...restField}
-                        name={[name, INPUT_NAME.ATTRIBUTE_NAME]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng nhập tên thuộc tính!",
-                          },
-                        ]}
-                        style={{ flexGrow: 1 }}
-                      >
-                        <Input placeholder="Tên thuộc tính" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, INPUT_NAME.ATTRIBUTE_VALUE]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Vui lòng nhập giá trị thuộc tính!",
-                          },
-                        ]}
-                        style={{ flexGrow: 1 }}
-                      >
-                        <Input placeholder="Giá trị thuộc tính" />
-                      </Form.Item>
-                      <Form.Item>
-                        <MinusCircleOutlined onClick={() => remove(name)} />
-                      </Form.Item>
+                {fields
+                  .filter(({ name }) => {
+                    const attributes = form.getFieldValue(
+                      INPUT_NAME.ATTRIBUTES,
+                    );
+                    return !attributes[name]?.delete;
+                  })
+                  .map(({ key, name, ...restField }) => (
+                    <div key={key} className="col-span-6">
+                      <div className="mb-2 flex gap-2 align-baseline">
+                        <Form.Item
+                          {...restField}
+                          name={[name, INPUT_NAME.ATTRIBUTE_NAME]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập tên thuộc tính!",
+                            },
+                          ]}
+                          style={{ flexGrow: 1 }}
+                        >
+                          <Input placeholder="Tên thuộc tính" />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, INPUT_NAME.ATTRIBUTE_VALUE]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập giá trị thuộc tính!",
+                            },
+                          ]}
+                          style={{ flexGrow: 1 }}
+                        >
+                          <Input placeholder="Giá trị thuộc tính" />
+                        </Form.Item>
+                        <Form.Item>
+                          <MinusCircleOutlined
+                            onClick={() => {
+                              const attributes = form.getFieldValue(
+                                INPUT_NAME.ATTRIBUTES,
+                              );
+
+                              if (attributes[name]?._id) {
+                                attributes[name].delete = true;
+                                form.setFieldsValue({
+                                  [INPUT_NAME.ATTRIBUTES]: attributes,
+                                });
+                              } else {
+                                remove(name);
+                              }
+                            }}
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 <div className="col-span-2">
                   <Form.Item>
                     <Button
                       type="dashed"
-                      onClick={() => add()}
+                      onClick={() => add({ add: true })}
                       block
                       icon={<PlusOutlined />}
                     >
@@ -510,225 +578,159 @@ const ProductForm = ({
           >
             {(fields, { add, remove }) => (
               <div className="grid grid-cols-12 gap-6">
-                {fields.map((field) => (
-                  <div key={field.key} className="col-span-6">
-                    <Card
-                      size="small"
-                      title={`Biến thể ${field.name + 1}`}
-                      extra={
-                        <CloseOutlined
-                          onClick={() => {
-                            remove(field.name);
-                          }}
-                        />
-                      }
-                    >
-                      <Form.Item
-                        name={[field.name, INPUT_NAME.QUANTITY]}
-                        label="Số lượng"
-                        rules={[
-                          {
-                            type: "number",
-                            min: 1,
-                            message: "Số lượng sản phẩm phải lớn hơn 0!",
-                          },
-                          {
-                            required: true,
-                            message: "Vui lòng nhập số lượng sản phẩm!",
-                          },
-                        ]}
-                      >
-                        <InputNumber min={1} style={{ width: "100%" }} />
-                      </Form.Item>
-                      <div className="flex gap-4">
-                        <div className="w-1/2">
-                          <Form.Item
-                            name={[field.name, INPUT_NAME.PRICE]}
-                            label="Giá bán"
-                            rules={[
-                              {
-                                type: "number",
-                                min: 1,
-                                message: "Giá bán phải lớn hơn 0!",
-                              },
-                              {
-                                required: true,
-                                message: "Vui lòng nhập giá bán!",
-                              },
-                            ]}
-                          >
-                            <InputNumber min={1} style={{ width: "100%" }} />
-                          </Form.Item>
-                        </div>
-                        <div className="w-1/2">
-                          <Form.Item
-                            shouldUpdate={(prev, cur) =>
-                              prev?.[INPUT_NAME.VARIANTS]?.[field.name]?.[
-                                INPUT_NAME.PRICE
-                              ] !==
-                              cur?.[INPUT_NAME.VARIANTS]?.[field.name]?.[
-                                INPUT_NAME.PRICE
-                              ]
-                            }
-                            noStyle
-                          >
-                            {({ getFieldValue }) => {
-                              const price = getFieldValue([
+                {fields
+                  .filter(({ name }) => {
+                    const variant = form.getFieldValue(INPUT_NAME.VARIANTS);
+                    return !variant[name]?.delete;
+                  })
+                  .map((field) => (
+                    <div key={field.key} className="col-span-6">
+                      <Card
+                        size="small"
+                        title={`Biến thể ${field.name + 1}`}
+                        extra={
+                          <CloseOutlined
+                            onClick={() => {
+                              const variants = form.getFieldValue(
                                 INPUT_NAME.VARIANTS,
-                                field.name,
-                                INPUT_NAME.PRICE,
-                              ]);
-
-                              return (
-                                <Form.Item
-                                  name={[
-                                    field.name,
-                                    INPUT_NAME.PRICE_APPLIED_DATE,
-                                  ]}
-                                  label="Ngày áp dụng giá bán"
-                                  rules={[
-                                    ({ getFieldValue }) => {
-                                      const validatorPrice = getFieldValue([
-                                        INPUT_NAME.VARIANTS,
-                                        field.name,
-                                        INPUT_NAME.PRICE,
-                                      ]);
-
-                                      return {
-                                        validator(_, value) {
-                                          if (validatorPrice > 0 && !value) {
-                                            return Promise.reject(
-                                              "Vui lòng nhập ngày áp dụng!",
-                                            );
-                                          }
-                                          if (
-                                            dayjs(value).isBefore(
-                                              dayjs(),
-                                              "day",
-                                            )
-                                          ) {
-                                            return Promise.reject(
-                                              "Ngày áp dụng phải lớn hơn ngày hiện tại!",
-                                            );
-                                          }
-                                          if (
-                                            (!validatorPrice ||
-                                              validatorPrice === 0) &&
-                                            value
-                                          ) {
-                                            return Promise.reject(
-                                              "Không được chọn ngày khi không có giá bán!",
-                                            );
-                                          }
-                                          return Promise.resolve();
-                                        },
-                                      };
-                                    },
-                                  ]}
-                                  initialValue={null}
-                                >
-                                  <DatePicker
-                                    style={{ width: "100%" }}
-                                    format={"DD/MM/YYYY"}
-                                    placeholder="Chọn ngày"
-                                    disabledDate={(current) => {
-                                      return (
-                                        current &&
-                                        current < dayjs().startOf("day")
-                                      );
-                                    }}
-                                    disabled={!price || price === 0}
-                                  />
-                                </Form.Item>
                               );
+
+                              if (variants[field.name]?._id) {
+                                variants[field.name].delete = true;
+                                form.setFieldsValue({
+                                  [INPUT_NAME.VARIANTS]: variants,
+                                });
+                              } else {
+                                remove(field.name);
+                              }
                             }}
-                          </Form.Item>
-                        </div>
-                      </div>
-                      <div className="flex items-end gap-2">
-                        <div className="flex-grow">
-                          <Form.Item
-                            name={[field.name, INPUT_NAME.SIZE]}
-                            label="Kích thước"
-                          >
-                            <Select
-                              placeholder="Chọn kích thước"
-                              showSearch
-                              optionFilterProp="children"
+                          />
+                        }
+                      >
+                        <div className="flex gap-4">
+                          <div className="w-1/2">
+                            <Form.Item
+                              name={[field.name, INPUT_NAME.QUANTITY]}
+                              label="Số lượng"
+                              rules={[
+                                {
+                                  type: "number",
+                                  min: 1,
+                                  message: "Số lượng sản phẩm phải lớn hơn 0!",
+                                },
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập số lượng sản phẩm!",
+                                },
+                              ]}
                             >
-                              {sizeOptions.length > 0 &&
-                                sizeOptions.map((size, i) => (
-                                  <Select.Option
-                                    key={`product-form-size-selection-option-${i}-${size?._id}`}
-                                    value={size?._id}
-                                  >
-                                    {size?.name}
-                                  </Select.Option>
-                                ))}
-                            </Select>
-                          </Form.Item>
-                        </div>
-                        <Form.Item>
-                          <Button
-                            type="dashed"
-                            onClick={() => setShowAddSizeModal(true)}
-                          >
-                            Thêm mới
-                          </Button>
-                        </Form.Item>
-                      </div>
-                      <div className="flex items-end gap-2">
-                        <div className="flex-grow">
-                          <Form.Item
-                            name={[field.name, INPUT_NAME.COLOR]}
-                            label="Màu sắc"
-                          >
-                            <Select
-                              placeholder="Chọn màu sắc"
-                              showSearch
-                              optionFilterProp="children"
+                              <InputNumber min={1} style={{ width: "100%" }} />
+                            </Form.Item>
+                          </div>
+                          <div className="w-1/2">
+                            <Form.Item
+                              name={[field.name, INPUT_NAME.PRICE]}
+                              label="Giá bán"
+                              rules={[
+                                {
+                                  type: "number",
+                                  min: 1,
+                                  message: "Giá bán phải lớn hơn 0!",
+                                },
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập giá bán!",
+                                },
+                              ]}
                             >
-                              {coloroptions.length > 0 &&
-                                coloroptions.map((color, i) => (
-                                  <Select.Option
-                                    key={`product-form-color-selection-option-${i}-${color?._id}`}
-                                    value={color?._id}
-                                  >
-                                    <div className="flex items-center gap-2.5">
-                                      <div
-                                        style={{
-                                          background: color?.hex,
-                                          border:
-                                            color?.hex === "#ffffff"
-                                              ? "1px solid #d1d5db"
-                                              : "none",
-                                        }}
-                                        className="rounded-full p-2"
-                                      ></div>
-                                      <span>{color?.name}</span>
-                                    </div>
-                                  </Select.Option>
-                                ))}
-                            </Select>
+                              <InputNumber min={1} style={{ width: "100%" }} />
+                            </Form.Item>
+                          </div>
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <div className="flex-grow">
+                            <Form.Item
+                              name={[field.name, INPUT_NAME.SIZE]}
+                              label="Kích thước"
+                            >
+                              <Select
+                                placeholder="Chọn kích thước"
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {sizeOptions.length > 0 &&
+                                  sizeOptions.map((size, i) => (
+                                    <Select.Option
+                                      key={`product-form-size-selection-option-${i}-${size?._id}`}
+                                      value={size?._id}
+                                    >
+                                      {size?.name}
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            </Form.Item>
+                          </div>
+                          <Form.Item>
+                            <Button
+                              type="dashed"
+                              onClick={() => setShowAddSizeModal(true)}
+                            >
+                              Thêm mới
+                            </Button>
                           </Form.Item>
                         </div>
-                        <Form.Item>
-                          <Button
-                            type="dashed"
-                            onClick={() => setShowAddColorModal(true)}
-                          >
-                            Thêm mới
-                          </Button>
-                        </Form.Item>
-                      </div>
-                    </Card>
-                  </div>
-                ))}
+                        <div className="flex items-end gap-2">
+                          <div className="flex-grow">
+                            <Form.Item
+                              name={[field.name, INPUT_NAME.COLOR]}
+                              label="Màu sắc"
+                            >
+                              <Select
+                                placeholder="Chọn màu sắc"
+                                showSearch
+                                optionFilterProp="children"
+                              >
+                                {coloroptions.length > 0 &&
+                                  coloroptions.map((color, i) => (
+                                    <Select.Option
+                                      key={`product-form-color-selection-option-${i}-${color?._id}`}
+                                      value={color?._id}
+                                    >
+                                      <div className="flex items-center gap-2.5">
+                                        <div
+                                          style={{
+                                            background: color?.hex,
+                                            border:
+                                              color?.hex === "#ffffff"
+                                                ? "1px solid #d1d5db"
+                                                : "none",
+                                          }}
+                                          className="rounded-full p-2"
+                                        ></div>
+                                        <span>{color?.name}</span>
+                                      </div>
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            </Form.Item>
+                          </div>
+                          <Form.Item>
+                            <Button
+                              type="dashed"
+                              onClick={() => setShowAddColorModal(true)}
+                            >
+                              Thêm mới
+                            </Button>
+                          </Form.Item>
+                        </div>
+                      </Card>
+                    </div>
+                  ))}
                 <div className="col-span-2">
                   <Button
                     type="dashed"
                     onClick={() => {
-                      add();
+                      add({ add: true });
                     }}
                     block
                     icon={<PlusOutlined />}
@@ -759,4 +761,4 @@ const ProductForm = ({
   );
 };
 
-export default ProductForm;
+export default EditProductForm;

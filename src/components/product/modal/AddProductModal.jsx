@@ -1,9 +1,8 @@
-import { createNewCategory } from "@/services/categoryService";
 import StatusCodes from "@/utils/status/StatusCodes";
 import { Modal } from "antd";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import ProductForm from "../form/ProductForm";
+import AddProductForm from "../form/AddProductForm";
 import { createNewProduct } from "@/services/productService";
 
 const FORM_NAME = "add-product-form";
@@ -55,7 +54,7 @@ const AddProductModal = ({
       width={1200}
       style={{ top: 20 }}
     >
-      <ProductForm name={FORM_NAME} handleSave={handleSave} />
+      <AddProductForm name={FORM_NAME} handleSave={handleSave} />
     </Modal>
   );
 };

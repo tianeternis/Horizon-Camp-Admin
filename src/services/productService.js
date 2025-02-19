@@ -21,18 +21,7 @@ export const createNewProduct = ({
   }
 
   if (variants && variants?.length > 0) {
-    const newVariants = variants?.map(({ priceAppliedDate, ...rest }) => {
-      const newDate = priceAppliedDate
-        ? new Date(priceAppliedDate).toISOString()
-        : null;
-
-      return {
-        ...rest,
-        priceAppliedDate: newDate,
-      };
-    });
-
-    formData.append("variants", JSON.stringify(newVariants));
+    formData.append("variants", JSON.stringify(variants));
   }
 
   if (discountStartDate) {
@@ -64,4 +53,8 @@ export const getProductsForAdmin = (search, page, limit, status, sort) => {
   if (sort) params.append("sort", sort);
 
   return axios.get(`/product/get-for-admin?${params.toString()}`);
+};
+
+export const getProductByID = (id) => {
+  return axios.get(`/product/get/${id}`);
 };
