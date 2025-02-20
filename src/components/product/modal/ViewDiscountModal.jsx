@@ -2,13 +2,17 @@ import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
 import StatusCodes from "@/utils/status/StatusCodes";
 import { Collapse, Empty, Modal, Table, Tag, Tooltip } from "antd";
 import { useEffect, useState } from "react";
-import { getDiscountsByProductID } from "@/services/discountService";
+import {
+  deleteDiscount,
+  getDiscountsByProductID,
+} from "@/services/discountService";
 import { RiEdit2Fill } from "react-icons/ri";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import EditFutureDiscountModal from "./EditFutureDiscountModal";
 import ConfirmModal from "@/components/modal/ConfirmModal";
 import EditCurrentDiscountModal from "./EditCurrentDiscountModal";
 import AddDiscountModal from "./AddDiscountModal";
+import { toast } from "react-toastify";
 
 const ViewDiscountModal = ({
   open = false,
@@ -49,6 +53,22 @@ const ViewDiscountModal = ({
     }
   }, [productID]);
 
+  const handleDeleteDiscount = async () => {
+    if (deleteModal.data && deleteModal.data?._id) {
+      const res = await deleteDiscount(deleteModal?.data?._id);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        setDeletModal({ show: false, data: null });
+        fetchData(productID);
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+    }
+  };
+
   return (
     <Modal
       title={`Xem thông tin chiết khấu ${data?.product?.name}`}
@@ -59,7 +79,7 @@ const ViewDiscountModal = ({
       okButtonProps={{ hidden: true }}
       width={800}
       loading={loading}
-      style={{ top: 20 }}
+      style={{ top: 40 }}
     >
       <div>
         <div className="space-y-4 py-3">
@@ -73,7 +93,7 @@ const ViewDiscountModal = ({
                 <ul className="ms-6 space-y-1.5">
                   <li className="space-x-2">
                     <span className="font-medium">Giá trị:</span>
-                    <span>{data?.discount?.current?.value}</span>
+                    <span>{data?.discount?.current?.value}%</span>
                   </li>
                   <li className="space-x-2">
                     <span className="font-medium">Ngày bắt đầu:</span>
@@ -281,6 +301,8 @@ const ViewDiscountModal = ({
             open={editFutureModal.show}
             handleClose={() => setEditFutureModal({ show: false, data: null })}
             discount={editFutureModal.data}
+            productID={productID}
+            refetch={fetchData}
           />
         )}
         {editCurrentModal.show && (
@@ -288,12 +310,16 @@ const ViewDiscountModal = ({
             open={editCurrentModal.show}
             handleClose={() => setEditCurrentModal({ show: false, data: null })}
             discount={editCurrentModal.data}
+            productID={productID}
+            refetch={fetchData}
           />
         )}
         {showAddModal && (
           <AddDiscountModal
             open={showAddModal}
             handleClose={() => setShowAddModal(false)}
+            productID={productID}
+            refetch={fetchData}
           />
         )}
         {deleteModal.show && (
@@ -301,6 +327,7 @@ const ViewDiscountModal = ({
             open={deleteModal.show}
             handleClose={() => setDeletModal({ show: false, data: null })}
             content={"Bạn có chắc chắn muốn xóa giảm giá này không?"}
+            handleOK={handleDeleteDiscount}
           />
         )}
       </div>
