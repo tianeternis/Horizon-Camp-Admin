@@ -11,6 +11,7 @@ import User from "@/pages/User";
 import Category from "@/pages/Category";
 import Brand from "@/pages/Brand";
 import PicnicGuide from "@/pages/PicnicGuide";
+import Product from "@/pages/Product";
 
 const routes = [
   {
@@ -39,6 +40,10 @@ const routes = [
           {
             path: "manage-brand",
             element: <Brand />,
+          },
+          {
+            path: "manage-product",
+            element: <Product />,
           },
           {
             path: "picnic-guide",
