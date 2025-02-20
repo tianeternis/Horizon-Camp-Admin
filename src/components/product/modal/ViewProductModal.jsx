@@ -2,7 +2,7 @@ import { getProductByID } from "@/services/productService";
 import { formatCurrency } from "@/utils/format/currency";
 import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
 import StatusCodes from "@/utils/status/StatusCodes";
-import { Collapse, Image, Modal, Table, Tag } from "antd";
+import { Collapse, Empty, Image, Modal, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import isEmpty from "lodash/isEmpty";
 
@@ -245,6 +245,14 @@ const ViewProductModal = ({
                           : []
                       }
                       pagination={false}
+                      locale={{
+                        emptyText: (
+                          <Empty
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            description="Không có dữ liệu"
+                          />
+                        ),
+                      }}
                     />
                   ),
                 },
@@ -291,6 +299,14 @@ const ViewProductModal = ({
                           : []
                       }
                       pagination={false}
+                      locale={{
+                        emptyText: (
+                          <Empty
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            description="Không có dữ liệu"
+                          />
+                        ),
+                      }}
                     />
                   ),
                 },
