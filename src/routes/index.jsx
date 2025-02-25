@@ -12,6 +12,7 @@ import Category from "@/pages/Category";
 import Brand from "@/pages/Brand";
 import PicnicGuide from "@/pages/PicnicGuide";
 import Product from "@/pages/Product";
+import Order from "@/pages/Order";
 
 const routes = [
   {
@@ -44,6 +45,10 @@ const routes = [
           {
             path: "manage-product",
             element: <Product />,
+          },
+          {
+            path: "order",
+            element: <Order />,
           },
           {
             path: "picnic-guide",

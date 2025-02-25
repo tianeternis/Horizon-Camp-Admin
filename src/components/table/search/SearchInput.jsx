@@ -20,6 +20,7 @@ const SearchInput = ({
         style={{ height: BUTTON_HEIGHT, width: width }}
       >
         <input
+          type="search"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
