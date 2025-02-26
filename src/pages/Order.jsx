@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { getOrders } from "@/services/orderService";
 import StatusCodes from "@/utils/status/StatusCodes";
 import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
-import ViewOrderDetailModal from "@/components/order/ViewOrderDetailModal";
+import ViewOrderDetailModal from "@/components/order/modal/ViewOrderDetailModal";
 
 const FILTER_KEY = {
   paymentMethod: "paymentMethod",
