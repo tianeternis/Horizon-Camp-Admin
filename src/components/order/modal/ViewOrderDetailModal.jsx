@@ -1,4 +1,10 @@
-import { getOrderByID } from "@/services/orderService";
+import {
+  acceptOrder,
+  cancelOrder,
+  completeOrder,
+  completePreparingOrder,
+  getOrderByID,
+} from "@/services/orderService";
 import { formatDateToHHMMDDMMYYYY } from "@/utils/format/date";
 import StatusCodes from "@/utils/status/StatusCodes";
 import { Button, Modal } from "antd";
@@ -9,44 +15,102 @@ import { PiNotepad } from "react-icons/pi";
 import { formatAddress } from "@/utils/format/address";
 import { formatCurrency } from "@/utils/format/currency";
 import { ORDER_STATUS } from "@/utils/order";
+import { toast } from "react-toastify";
 
 const ViewOrderDetailModal = ({
   open = false,
   handleClose = () => {},
   orderID = null,
+  refetch = () => {},
 }) => {
   const [order, setOrder] = useState();
 
   const [actionLoading, setActionLoading] = useState(false);
 
+  const fetchOrder = async (orderID) => {
+    const res = await getOrderByID(orderID);
+
+    if (res && res.EC === StatusCodes.SUCCESS) {
+      setOrder(res.DT);
+    }
+  };
+
   useEffect(() => {
     if (orderID) {
-      const fetchOrder = async () => {
-        const res = await getOrderByID(orderID);
-
-        if (res && res.EC === StatusCodes.SUCCESS) {
-          setOrder(res.DT);
-        }
-      };
-
-      fetchOrder();
+      fetchOrder(orderID);
     }
   }, [orderID]);
 
-  const handleAccept = () => {
-    console.log("accept", order);
+  const handleAccept = async () => {
+    if (orderID) {
+      setActionLoading(true);
+      const res = await acceptOrder(orderID);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        await fetchOrder(orderID);
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+      setActionLoading(false);
+    }
   };
 
-  const handleCancel = () => {
-    console.log("cancel", order);
+  const handleCancel = async () => {
+    if (orderID) {
+      setActionLoading(true);
+      const res = await cancelOrder(orderID);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        await fetchOrder(orderID);
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+      setActionLoading(false);
+    }
   };
 
-  const handleCompletePreparing = () => {
-    console.log("complete preparing", order);
+  const handleCompletePreparing = async () => {
+    if (orderID) {
+      setActionLoading(true);
+      const res = await completePreparingOrder(orderID);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        await fetchOrder(orderID);
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+      setActionLoading(false);
+    }
   };
 
-  const handleCompleteDelivering = () => {
-    console.log("complete delivering", order);
+  const handleCompleteDelivering = async () => {
+    if (orderID) {
+      setActionLoading(true);
+      const res = await completeOrder(orderID);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        await fetchOrder(orderID);
+        refetch();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -125,7 +189,7 @@ const ViewOrderDetailModal = ({
               <span className="text-main">#{order?._id}</span>
             </div>
             <div className="text-sm text-neutral-500">
-              <sapn>Ngày đặt: </sapn>
+              <span>Ngày đặt: </span>
               <span className="text-gray-800">
                 {formatDateToHHMMDDMMYYYY(order?.orderDate)}
               </span>
@@ -181,7 +245,7 @@ const ViewOrderDetailModal = ({
               </div>
               <div className="flex items-center">
                 <PiNotepad className="mr-2 text-xl text-orange-400" />
-                <div className="text-sm text-gray-600">{order?.note}</div>
+                <div className="text-sm text-gray-600">{order?.notes}</div>
               </div>
             </div>
             <div className="w-1/2 space-y-4 pl-6">

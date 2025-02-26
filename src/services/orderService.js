@@ -33,3 +33,19 @@ export const getOrders = (
 export const getOrderByID = (id) => {
   return axios.get(`/order/get-order-detail/${id}`);
 };
+
+export const acceptOrder = (id) => {
+  return axios.put(`/order/accept-order/${id}`);
+};
+
+export const completePreparingOrder = (id) => {
+  return axios.put(`/order/complete-preparing/${id}`);
+};
+
+export const completeOrder = (id) => {
+  return axios.put(`/order/complete-order/${id}`);
+};
+
+export const cancelOrder = (id) => {
+  return axios.put(`/order/cancel/${id}`, { admin: true });
+};

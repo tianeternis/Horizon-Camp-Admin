@@ -345,7 +345,7 @@ const Order = ({}) => {
             hasIndexColumn: false,
             scroll: {
               hasScroll: true,
-              scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
+              scrollSetting: { scrollToFirstRowOnChange: true, y: 281 },
             },
             loading: loading,
           }}
@@ -355,7 +355,7 @@ const Order = ({}) => {
             onChange: (page) => handleChangePage(+page),
             total: totalPages,
             pageSize: PAGE_SIZE,
-            showTotal: (total) => `Tổng sản phẩm: ${total}`,
+            showTotal: (total) => `Tổng đơn hàng: ${total}`,
           }}
           filterMenu={{
             hasFilterMenu: true,
@@ -415,6 +415,17 @@ const Order = ({}) => {
           open={viewModal.show}
           handleClose={() => setViewModal({ show: false, data: null })}
           orderID={viewModal?.data?._id}
+          refetch={async () =>
+            await fetchOrders(
+              orderStatus,
+              filter?.[FILTER_KEY.paymentMethod]?.key,
+              filter?.[FILTER_KEY.paymentStatus]?.key,
+              sort?.key,
+              searchKeyWords,
+              currentPage,
+              PAGE_SIZE,
+            )
+          }
         />
       )}
     </div>
