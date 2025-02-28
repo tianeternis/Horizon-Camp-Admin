@@ -40,10 +40,21 @@ export const userSlice = createSlice({
       ...state,
       account: { ...state.account, accessToken: action?.payload?.accessToken },
     }),
+    updateProfile: (state, action) => ({
+      ...state,
+      account: {
+        ...state.account,
+        fullName: action?.payload?.fullName,
+        phone: action?.payload?.phone,
+        birthday: action?.payload?.birthday,
+        gender: action?.payload?.gender,
+        avatar: action?.payload?.avatar,
+      },
+    }),
   },
 });
 
-export const { loginSuccess, logoutSuccess, updateAccessToken } =
+export const { loginSuccess, logoutSuccess, updateAccessToken, updateProfile } =
   userSlice.actions;
 
 export default userSlice.reducer;

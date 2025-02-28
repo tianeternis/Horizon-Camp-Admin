@@ -28,7 +28,7 @@ const LoginForm = () => {
     }
 
     if (res && res.EC === StatusCodes.ERRROR) {
-      toast.error(res.EC);
+      toast.error(res.EM);
     }
   };
 

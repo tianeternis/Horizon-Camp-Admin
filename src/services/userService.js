@@ -25,3 +25,23 @@ export const getUserByID = (id) => {
 export const editUser = (id, data) => {
   return axios.put(`/user/edit-user/${id}`, data);
 };
+
+export const changePassword = (id, data) => {
+  return axios.put(`/user/change-password/${id}`, data);
+};
+
+export const editProfile = (
+  id,
+  { fullName, gender, phone, birthday, avatar },
+) => {
+  const formData = new FormData();
+  formData.append("fullName", fullName);
+  formData.append("gender", gender);
+  formData.append("phone", phone);
+  formData.append("avatar", avatar);
+  if (birthday) {
+    formData.append("birthday", new Date(birthday).toISOString());
+  }
+
+  return axios.put(`/user/edit-profile/${id}`, formData);
+};

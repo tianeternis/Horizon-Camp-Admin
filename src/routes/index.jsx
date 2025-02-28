@@ -13,6 +13,7 @@ import Brand from "@/pages/Brand";
 import PicnicGuide from "@/pages/PicnicGuide";
 import Product from "@/pages/Product";
 import Order from "@/pages/Order";
+import Profile from "@/pages/Profile";
 
 const routes = [
   {
@@ -53,6 +54,10 @@ const routes = [
           {
             path: "picnic-guide",
             element: <PicnicGuide />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
           },
         ],
       },
