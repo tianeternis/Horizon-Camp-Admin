@@ -1,0 +1,8 @@
+.dashboard .time-filter .default-height {
+  height: 36px;
+}
+
+.dashboard .time-filter .ant-select .ant-select-selector,
+.dashboard .time-filter .ant-picker.ant-picker-range {
+  border-color: #f3f4f6;
+}
