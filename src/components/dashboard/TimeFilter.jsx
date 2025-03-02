@@ -12,7 +12,7 @@ const timeRanges = [
 
 const viewTypes = [
   { label: "Hàng ngày", value: "daily" },
-  { label: "Hàng tháng", value: "monthy" },
+  { label: "Hàng tháng", value: "monthly" },
   { label: "Hàng năm", value: "yearly" },
 ];
 
@@ -41,7 +41,11 @@ const TimeFilter = ({ onSubmit = (value) => {} }) => {
 
   const handleDateChange = (dates) => {
     setDates(dates);
-    setTimeRange(null);
+    if (dates) {
+      setTimeRange(null);
+    } else {
+      setTimeRange(DEFAULT_TIME_RANGE);
+    }
   };
 
   const handleSubmit = () => {
