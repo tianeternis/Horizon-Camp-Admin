@@ -187,7 +187,7 @@ const Product = ({}) => {
     setCurrentPage(page);
     await fetchProducts(
       searchKeyWords,
-      currentPage,
+      page,
       PAGE_SIZE,
       filter[FILTER_KEY.status]?.key,
       sort?.key,
