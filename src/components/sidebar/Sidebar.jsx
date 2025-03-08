@@ -22,11 +22,11 @@ const SITEMAP = [
     label: <Link to="/">Dashboard</Link>,
     icon: <BiSolidDashboard />,
   },
-  {
-    key: "statistical",
-    label: <Link to="/statistical">Thống kê</Link>,
-    icon: <BiSolidPieChartAlt2 />,
-  },
+  // {
+  //   key: "statistical",
+  //   label: <Link to="/statistical">Thống kê</Link>,
+  //   icon: <BiSolidPieChartAlt2 />,
+  // },
   {
     key: "user",
     label: <Link to="/manage-user">Quản lý người dùng</Link>,
@@ -61,21 +61,21 @@ const SITEMAP = [
     label: <Link to="/picnic-guide">Cẩm nang dã ngoại</Link>,
     icon: <BiSolidBook />,
   },
-  {
-    key: "coupon",
-    label: <Link to="/coupon">Khuyến mãi</Link>,
-    icon: <BiSolidCoupon />,
-  },
-  {
-    key: "contact",
-    label: <Link to="/contact">Liên hệ</Link>,
-    icon: <BiSupport />,
-  },
-  {
-    key: "review",
-    label: <Link to="/review">Đánh giá</Link>,
-    icon: <MdReviews />,
-  },
+  // {
+  //   key: "coupon",
+  //   label: <Link to="/coupon">Khuyến mãi</Link>,
+  //   icon: <BiSolidCoupon />,
+  // },
+  // {
+  //   key: "contact",
+  //   label: <Link to="/contact">Liên hệ</Link>,
+  //   icon: <BiSupport />,
+  // },
+  // {
+  //   key: "review",
+  //   label: <Link to="/review">Đánh giá</Link>,
+  //   icon: <MdReviews />,
+  // },
 ];
 
 const Sidebar = ({ collapsed = false, width = 240, collapsedWidth = 90 }) => {
