@@ -7,15 +7,23 @@ import { Image, Switch, Tag, Tooltip } from "antd";
 import { BiEditAlt, BiTrash } from "react-icons/bi";
 import { MdPublishedWithChanges } from "react-icons/md";
 import { HiPlusCircle } from "react-icons/hi2";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiEye } from "react-icons/fi";
+import AddPicnicGuideModal from "@/components/picnicGuide/AddPicnicGuideModal";
+import {
+  changePublisedStatus,
+  deleteGuide,
+  getPicnicGuides,
+} from "@/services/guideService";
+import StatusCodes from "@/utils/status/StatusCodes";
+import { toast } from "react-toastify";
+import { PAGE_SIZE } from "@/constants";
+import ConfirmModal from "@/components/modal/ConfirmModal";
+import EditPicnicGuideModal from "@/components/picnicGuide/EditPicnicGuideModal";
+import ViewPicnicGuideModal from "@/components/picnicGuide/ViewPicnicGuideModal";
 
-const DATA_LENGTH = 40;
-const PAGE_SIZE = 10;
-
-const DEFAULT_STATUS = { key: "default", label: "Chọn trạng thái đăng tải" };
-
-const status = [
+const statuses = [
+  { key: "default", label: "Chọn trạng thái đăng tải" },
   {
     key: "published",
     label: "Đã đăng cẩm nang",
@@ -35,7 +43,7 @@ const columns = [
     render: (_, record) => (
       <div className="flex flex-col items-center justify-center gap-2.5">
         <Avatar src={record?.author?.avatar || undefined} size={36} />
-        <span className="font-semibold">{record?.author?.fullname}</span>
+        <span className="font-semibold">{record?.author?.fullName}</span>
       </div>
     ),
   },
@@ -62,6 +70,7 @@ const columns = [
     title: "Ngày tạo",
     dataIndex: "createdAt",
     width: 140,
+    align: "center",
     render: (createdAt) => formatDateToHHMMDDMMYYYY(createdAt),
   },
   {
@@ -69,6 +78,7 @@ const columns = [
     title: "Trạng thái",
     dataIndex: "status",
     width: 100,
+    align: "center",
     render: (_, record) => (
       <Tag color={record?.isPublished ? "green" : "gold"}>
         <span className="uppercase">
@@ -78,146 +88,317 @@ const columns = [
     ),
   },
   {
-    key: "publishAt",
+    key: "publishedAt",
     title: "Ngày đăng cuối cùng",
-    dataIndex: "publishAt",
+    dataIndex: "publishedAt",
     width: 140,
-    render: (createdAt) => formatDateToHHMMDDMMYYYY(createdAt),
+    align: "center",
+    render: (publishedAt) =>
+      publishedAt ? formatDateToHHMMDDMMYYYY(publishedAt) : "--",
   },
   {
-    key: "updateAt",
+    key: "updatedAt",
     title: "Ngày cập nhật cuối cùng",
-    dataIndex: "updateAt",
+    dataIndex: "updatedAt",
     width: 140,
-    render: (createdAt) => formatDateToHHMMDDMMYYYY(createdAt),
+    align: "center",
+    render: (updatedAt) =>
+      updatedAt ? formatDateToHHMMDDMMYYYY(updatedAt) : "--",
   },
 ];
 
-const dataSource = Array.from({
-  length: DATA_LENGTH,
-}).map((_, i) => ({
-  key: i,
-  author: {
-    fullname: `Nguyễn Thiên Vũ ${i}`,
-    avatar: "https://dongvat.edu.vn/upload/2025/01/avatar-vo-tri-meo-01.webp",
-  },
-  image:
-    "https://bizweb.dktcdn.net/thumb/large/100/440/011/articles/t3.jpg?v=1635127761927",
-  title:
-    "Chia sẻ kinh nghiệm cắm trại hồ Dầu Tiếng để có 1 chuyến đi hơn cả mong đợi",
-  slug: "chia-se-kinh-nghiem-cam-trai-ho-dau-tieng-de-co-1-chuyen-di-hon-ca-mong-doi",
-  isPublished: true,
-  publishAt: new Date(),
-  updateAt: new Date(),
-  createdAt: new Date(),
-}));
+const sorts = [
+  { key: "newest", label: "Được tạo mới nhất" },
+  { key: "oldest", label: "Được tạo lâu nhất" },
+];
+
+const DEFAULT_STATUS = statuses[0];
+const DEFAULT_SORT = sorts[0];
 
 const PicnicGuide = ({}) => {
-  useDynamicTitle("Quản lý người dùng");
+  useDynamicTitle("Quản lý cẩm nang dã ngoại");
+
+  const [dataSource, setDataSource] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState(DEFAULT_STATUS);
   const [searchKeyWords, setSearchKeyWords] = useState("");
+  const [sort, setSort] = useState(DEFAULT_SORT);
 
-  const handleReset = () => {
+  const [loading, setLoading] = useState(false);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({
+    show: false,
+    data: null,
+    loading: false,
+  });
+  const [editModal, setEditModal] = useState({
+    show: false,
+    data: null,
+  });
+  const [viewModal, setViewModal] = useState({
+    show: false,
+    data: null,
+  });
+
+  const fetchGuides = async (status, search, sort, page, limit) => {
+    setLoading(true);
+
+    const res = await getPicnicGuides({ status, search, sort, page, limit });
+
+    if (res && res.EC === StatusCodes.SUCCESS) {
+      const data = res.DT?.data || [];
+
+      const newData = data?.map((item) => ({
+        ...item,
+        key: item?._id,
+      }));
+
+      setDataSource(newData);
+      setTotalPages(res.DT?.pagination?.total);
+    }
+
+    if (res && res.EC === StatusCodes.ERRROR) {
+      toast.error(res.EM);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchGuides(
+      selectedStatus?.key,
+      searchKeyWords,
+      sort?.key,
+      currentPage,
+      PAGE_SIZE,
+    );
+  }, []);
+
+  const handleSelectStatus = async (status) => {
+    setSelectedStatus(status);
+    setCurrentPage(1);
+    await fetchGuides(status?.key, searchKeyWords, sort?.key, 1, PAGE_SIZE);
+  };
+
+  const handleSelectSort = async (value) => {
+    setSort(value);
+    setCurrentPage(1);
+    await fetchGuides(
+      selectedStatus?.key,
+      searchKeyWords,
+      value?.key,
+      1,
+      PAGE_SIZE,
+    );
+  };
+
+  const handleChangePage = async (page) => {
+    setCurrentPage(page);
+    await fetchGuides(
+      selectedStatus?.key,
+      searchKeyWords,
+      sort?.key,
+      page,
+      PAGE_SIZE,
+    );
+  };
+
+  const handleReset = async () => {
     setCurrentPage(1);
     setSelectedStatus(DEFAULT_STATUS);
     setSearchKeyWords("");
+    setSort(DEFAULT_SORT);
+    await fetchGuides(DEFAULT_STATUS?.key, "", DEFAULT_SORT?.key, 1, PAGE_SIZE);
+  };
+
+  const changeIsPublished = async (guide, checked) => {
+    const res = await changePublisedStatus(guide?._id, checked);
+
+    if (res && res.EC === StatusCodes.SUCCESS) {
+      toast.success(res.EM);
+      await fetchGuides(
+        selectedStatus?.key,
+        searchKeyWords,
+        sort?.key,
+        currentPage,
+        PAGE_SIZE,
+      );
+    }
+
+    if (res && res.EC === StatusCodes.ERRROR) {
+      toast.error(res.EM);
+    }
+  };
+
+  const handleDeleteGuide = async () => {
+    if (deleteModal.data?._id) {
+      setDeleteModal((prev) => ({ ...prev, loading: true }));
+      const res = await deleteGuide(deleteModal.data?._id);
+
+      if (res && res.EC === StatusCodes.SUCCESS) {
+        toast.success(res.EM);
+        setDeleteModal((prev) => ({ ...prev, show: false, data: null }));
+        await handleReset();
+      }
+
+      if (res && res.EC === StatusCodes.ERRROR) {
+        toast.error(res.EM);
+      }
+      setDeleteModal((prev) => ({ ...prev, loading: false }));
+    }
   };
 
   return (
-    <ManagementContentLayout title="Quản lý cẩm nang dã ngoại">
-      <ManagementDataTable
-        table={{
-          columns,
-          dataSource,
-          hasIndexColumn: true,
-          scroll: {
-            hasScroll: true,
-            scrollSetting: { scrollToFirstRowOnChange: true, y: 341 },
-          },
-        }}
-        pagination={{
-          hasPagination: true,
-          current: currentPage,
-          onChange: (page) => setCurrentPage(+page),
-          total: DATA_LENGTH,
-          pageSize: PAGE_SIZE,
-          showTotal: (total) => `Tổng cẩm nang: ${total}`,
-        }}
-        filterMenu={{
-          hasFilterMenu: true,
-          menu: [
-            {
-              title: "Chọn vai trò",
-              icon: <MdPublishedWithChanges />,
-              menuItems: status,
-              selectedKey: selectedStatus,
-              setSelectedKey: (value) => setSelectedStatus(value),
+    <div>
+      <ManagementContentLayout title="Quản lý cẩm nang dã ngoại">
+        <ManagementDataTable
+          table={{
+            columns,
+            dataSource,
+            hasIndexColumn: true,
+            scroll: {
+              hasScroll: true,
+              scrollSetting: { scrollToFirstRowOnChange: true, y: 341 },
             },
-          ],
-        }}
-        search={{
-          hasSearchInput: true,
-          value: searchKeyWords,
-          setValue: setSearchKeyWords,
-          placeholder: "Tìm kiếm theo Tiêu đề cẩm nang hoặc Tác giả",
-          width: 400,
-          onSubmit: () => console.log(searchKeyWords),
-        }}
-        reset={{ hasResetButton: true, onClick: handleReset }}
-        crudButton={{
-          hasCRUDButton: true,
-          buttonsMenu: [
-            {
-              title: "Thêm cẩm nang",
-              icon: <HiPlusCircle />,
-              onClick: () => console.log("Thêm cẩm nang mới"),
-            },
-          ],
-        }}
-        actions={{
-          hasActions: true,
-          actionsMenu: [
-            {
-              title: "Xem nội dung cẩm nang",
-              icon: <FiEye className="text-blue-600" />,
-              onClick: (data) => console.log("Xem ", data),
-            },
-            {
-              title: "Chỉnh sửa",
-              icon: <BiEditAlt className="text-green-600" />,
-              onClick: (data) => console.log("Sửa ", data),
-            },
-            {
-              title: "Xóa",
-              icon: <BiTrash className="text-red-600" />,
-              onClick: (data) => console.log("Xóa ", data),
-            },
-            {
-              title: "Đăng/Gỡ cẩm nang",
-              render: (data) => (
-                <Tooltip
-                  title={
-                    data?.isPublished === true ? "Gỡ cẩm nang" : "Đăng cẩm nang"
-                  }
-                >
-                  <Switch
-                    size="small"
-                    // checked={data?.isPublished ?? false}
-                    defaultChecked={data?.isPublished ?? false}
-                    onChange={(checked) =>
-                      console.log("Gỡ/Đăng ", checked, data)
+            loading: loading,
+          }}
+          pagination={{
+            hasPagination: true,
+            current: currentPage,
+            onChange: (page) => handleChangePage(+page),
+            total: totalPages,
+            pageSize: PAGE_SIZE,
+            showTotal: (total) => `Tổng cẩm nang: ${total}`,
+          }}
+          filterMenu={{
+            hasFilterMenu: true,
+            menu: [
+              {
+                title: "Chọn trạng thái",
+                icon: <MdPublishedWithChanges />,
+                menuItems: statuses,
+                selectedKey: selectedStatus,
+                setSelectedKey: (value) => handleSelectStatus(value),
+              },
+            ],
+          }}
+          sortMenu={{
+            hasSortMenu: true,
+            menu: [
+              {
+                title: "Sắp xếp",
+                menuItems: sorts,
+                selectedKey: sort,
+                setSelectedKey: (value) => handleSelectSort(value),
+              },
+            ],
+          }}
+          search={{
+            hasSearchInput: true,
+            value: searchKeyWords,
+            setValue: setSearchKeyWords,
+            placeholder: "Tìm kiếm theo Tiêu đề cẩm nang",
+            width: 400,
+            onSubmit: () => console.log(searchKeyWords),
+          }}
+          reset={{ hasResetButton: true, onClick: handleReset }}
+          crudButton={{
+            hasCRUDButton: true,
+            buttonsMenu: [
+              {
+                title: "Thêm cẩm nang",
+                icon: <HiPlusCircle />,
+                onClick: () => setShowAddModal(true),
+              },
+            ],
+          }}
+          actions={{
+            hasActions: true,
+            actionsMenu: [
+              {
+                title: "Xem nội dung cẩm nang",
+                icon: <FiEye className="text-blue-600" />,
+                onClick: (data) => setViewModal({ show: true, data }),
+              },
+              {
+                title: "Chỉnh sửa",
+                icon: <BiEditAlt className="text-green-600" />,
+                onClick: (data) => setEditModal({ show: true, data }),
+              },
+              {
+                title: "Xóa",
+                icon: <BiTrash className="text-red-600" />,
+                onClick: (data) =>
+                  setDeleteModal((prev) => ({ ...prev, show: true, data })),
+              },
+              {
+                title: "Đăng/Gỡ cẩm nang",
+                render: (data) => (
+                  <Tooltip
+                    title={
+                      data?.isPublished === true
+                        ? "Gỡ cẩm nang"
+                        : "Đăng cẩm nang"
                     }
-                  />
-                </Tooltip>
-              ),
-            },
-          ],
-          widthColumn: 150,
-        }}
-      />
-    </ManagementContentLayout>
+                  >
+                    <Switch
+                      size="small"
+                      defaultChecked={data?.isPublished ?? false}
+                      onChange={(checked) => changeIsPublished(data, checked)}
+                    />
+                  </Tooltip>
+                ),
+              },
+            ],
+            widthColumn: 150,
+          }}
+        />
+      </ManagementContentLayout>
+      {showAddModal && (
+        <AddPicnicGuideModal
+          open={showAddModal}
+          handleClose={() => setShowAddModal(false)}
+          refetch={handleReset}
+        />
+      )}
+      {deleteModal.show && deleteModal.data && (
+        <ConfirmModal
+          open={deleteModal.show}
+          handleClose={() =>
+            setDeleteModal({ show: false, data: null, loading: false })
+          }
+          content={`Bạn có chắc muốn xóa cẩm nang với mã #${deleteModal.data?._id} hay không?`}
+          handleOK={handleDeleteGuide}
+          loading={deleteModal.loading}
+        />
+      )}
+      {editModal.show && editModal.data && (
+        <EditPicnicGuideModal
+          open={editModal.show}
+          handleClose={() => setEditModal({ show: false, data: null })}
+          initialValues={editModal.data}
+          refetch={async () =>
+            await fetchGuides(
+              selectedStatus?.key,
+              searchKeyWords,
+              sort?.key,
+              currentPage,
+              PAGE_SIZE,
+            )
+          }
+        />
+      )}
+      {viewModal.show && viewModal.data && (
+        <ViewPicnicGuideModal
+          open={viewModal.show}
+          handleClose={() => setViewModal({ show: false, data: null })}
+          guideSlug={viewModal.data?.slug}
+        />
+      )}
+    </div>
   );
 };
 

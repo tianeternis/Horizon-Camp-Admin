@@ -1,4 +1,4 @@
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import { HiOutlineInformationCircle } from "react-icons/hi2";
 
 const ConfirmModal = ({
@@ -6,6 +6,7 @@ const ConfirmModal = ({
   handleClose = () => {},
   handleOK = () => {},
   content = <></>,
+  loading = false,
 }) => {
   return (
     <Modal
@@ -16,7 +17,7 @@ const ConfirmModal = ({
       okButtonProps={{ hidden: true }}
       footer={
         <div className="flex justify-center gap-3">
-          <button
+          {/* <button
             className="rounded-md border border-solid border-gray-300 bg-transparent px-4 py-1.5 outline-none hover:bg-gray-50"
             onClick={handleClose}
           >
@@ -27,7 +28,19 @@ const ConfirmModal = ({
             onClick={handleOK}
           >
             Có, tôi chắc chắn
-          </button>
+          </button> */}
+          <Button loading={loading} disabled={loading} onClick={handleClose}>
+            Không, thoát
+          </Button>
+          <Button
+            loading={loading}
+            disabled={loading}
+            onClick={handleOK}
+            variant="solid"
+            color="danger"
+          >
+            Có, tôi chắc chắn
+          </Button>
         </div>
       }
       centered
