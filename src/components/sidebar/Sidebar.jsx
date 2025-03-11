@@ -11,6 +11,8 @@ import {
 } from "react-icons/bi";
 import { AiFillProduct } from "react-icons/ai";
 import { MdReviews } from "react-icons/md";
+import { RiTentFill } from "react-icons/ri";
+import { PiListBold } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { ConfigProvider, Layout, Menu } from "antd";
 
@@ -33,23 +35,19 @@ const SITEMAP = [
     icon: <BiSolidUser />,
   },
   {
-    key: "product",
-    label: "Sản phẩm", // Submenu không cần Link, nó là tiêu đề
+    key: "manage-category",
+    label: <Link to="/manage-category">Quản lý danh mục</Link>,
     icon: <AiFillProduct />,
-    children: [
-      {
-        key: "manage-category",
-        label: <Link to="/manage-category">Quản lý danh mục</Link>,
-      },
-      {
-        key: "manage-brand",
-        label: <Link to="/manage-brand">Quản lý thương hiệu</Link>,
-      },
-      {
-        key: "manage-product",
-        label: <Link to="/manage-product">Quản lý sản phẩm</Link>,
-      },
-    ],
+  },
+  {
+    key: "manage-brand",
+    label: <Link to="/manage-brand">Quản lý thương hiệu</Link>,
+    icon: <PiListBold />,
+  },
+  {
+    key: "manage-product",
+    label: <Link to="/manage-product">Quản lý sản phẩm</Link>,
+    icon: <RiTentFill />,
   },
   {
     key: "order",
