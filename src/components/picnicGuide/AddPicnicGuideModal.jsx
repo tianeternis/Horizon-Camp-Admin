@@ -73,8 +73,8 @@ const AddPicnicGuideModal = ({
         loading: loading,
         disabled: loading,
       }}
-      centered={true}
       width={900}
+      style={{ top: 20 }}
     >
       <Form
         form={form}
