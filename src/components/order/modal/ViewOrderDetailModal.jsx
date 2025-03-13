@@ -16,6 +16,7 @@ import { formatAddress } from "@/utils/format/address";
 import { formatCurrency } from "@/utils/format/currency";
 import { ORDER_STATUS } from "@/utils/order";
 import { toast } from "react-toastify";
+import Invoice from "@/components/invoice/Invoice";
 
 const ViewOrderDetailModal = ({
   open = false,
@@ -176,6 +177,9 @@ const ViewOrderDetailModal = ({
                 Hoàn thành giao hàng
               </Button>,
             ]
+          : []),
+        ...(order?.orderStatus === ORDER_STATUS.COMPLETED
+          ? [<Invoice key="invoice" order={order} />]
           : []),
       ]}
       width={1000}
