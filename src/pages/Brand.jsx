@@ -48,7 +48,7 @@ const columns = [
 ];
 
 const Brand = ({}) => {
-  useDynamicTitle("Quản lý thương hiệu");
+  useDynamicTitle("Thương hiệu sản phẩm");
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -106,7 +106,7 @@ const Brand = ({}) => {
 
   return (
     <div>
-      <ManagementContentLayout title="Quản lý thương hiệu">
+      <ManagementContentLayout title="Thương hiệu sản phẩm">
         <ManagementDataTable
           table={{
             columns,

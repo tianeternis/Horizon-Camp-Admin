@@ -31,22 +31,22 @@ const SITEMAP = [
   // },
   {
     key: "user",
-    label: <Link to="/manage-user">Quản lý người dùng</Link>,
+    label: <Link to="/manage-user">Người dùng</Link>,
     icon: <BiSolidUser />,
   },
   {
     key: "manage-category",
-    label: <Link to="/manage-category">Quản lý danh mục</Link>,
+    label: <Link to="/manage-category">Danh mục</Link>,
     icon: <AiFillProduct />,
   },
   {
     key: "manage-brand",
-    label: <Link to="/manage-brand">Quản lý thương hiệu</Link>,
+    label: <Link to="/manage-brand">Thương hiệu</Link>,
     icon: <PiListBold />,
   },
   {
     key: "manage-product",
-    label: <Link to="/manage-product">Quản lý sản phẩm</Link>,
+    label: <Link to="/manage-product">Sản phẩm</Link>,
     icon: <RiTentFill />,
   },
   {

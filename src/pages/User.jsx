@@ -145,7 +145,7 @@ const columns = [
 ];
 
 const User = ({}) => {
-  useDynamicTitle("Quản lý người dùng");
+  useDynamicTitle("Người dùng");
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -284,7 +284,7 @@ const User = ({}) => {
 
   return (
     <div>
-      <ManagementContentLayout title="Quản lý người dùng">
+      <ManagementContentLayout title="Người dùng">
         <ManagementDataTable
           table={{
             columns,

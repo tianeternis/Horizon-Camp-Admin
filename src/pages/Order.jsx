@@ -170,7 +170,7 @@ const columns = [
 ];
 
 const Order = ({}) => {
-  useDynamicTitle("Quản lý đơn hàng");
+  useDynamicTitle("Đơn hàng");
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -319,7 +319,7 @@ const Order = ({}) => {
 
   return (
     <div>
-      <ManagementContentLayout title="Quản lý đơn hàng">
+      <ManagementContentLayout title="Đơn hàng">
         <div className="pb-4">
           <ul className="flex w-full items-center overflow-x-auto overflow-y-hidden rounded-sm bg-gray-200">
             {orderStatuses.map((status, i) => {

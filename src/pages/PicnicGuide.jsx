@@ -116,7 +116,7 @@ const DEFAULT_STATUS = statuses[0];
 const DEFAULT_SORT = sorts[0];
 
 const PicnicGuide = ({}) => {
-  useDynamicTitle("Quản lý cẩm nang dã ngoại");
+  useDynamicTitle("Cẩm nang dã ngoại");
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -253,7 +253,7 @@ const PicnicGuide = ({}) => {
 
   return (
     <div>
-      <ManagementContentLayout title="Quản lý cẩm nang dã ngoại">
+      <ManagementContentLayout title="Cẩm nang dã ngoại">
         <ManagementDataTable
           table={{
             columns,

@@ -123,7 +123,7 @@ const columns = [
 ];
 
 const Product = ({}) => {
-  useDynamicTitle("Quản lý sản phẩm");
+  useDynamicTitle("Sản phẩm");
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -233,7 +233,7 @@ const Product = ({}) => {
 
   return (
     <div>
-      <ManagementContentLayout title="Quản lý sản phẩm">
+      <ManagementContentLayout title="Sản phẩm">
         <ManagementDataTable
           table={{
             columns,
