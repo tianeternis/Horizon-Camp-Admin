@@ -13,6 +13,13 @@ import { LuBadgePlus } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+const sorts = [
+  { key: "newest", label: "Tạo gần đây" },
+  { key: "oldest", label: "Tạo lâu nhất" },
+];
+
+const DEFAULT_SORT = sorts[0];
+
 const columns = [
   {
     key: "image",
@@ -52,17 +59,20 @@ const Brand = ({}) => {
 
   const [dataSource, setDataSource] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyWords, setSearchKeyWords] = useState("");
+  const [sort, setSort] = useState(DEFAULT_SORT);
+
   const [loading, setLoading] = useState(false);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editModal, setEditModal] = useState({ show: false, data: null });
 
-  const fetchBrands = async (search, page, limit) => {
+  const fetchBrands = async (search, sort, page, limit) => {
     setLoading(true);
 
-    const res = await getBrands(search, page, limit);
+    const res = await getBrands(search, sort, page, limit);
 
     if (res && res.EC === StatusCodes.SUCCESS) {
       const data = res.DT?.data || [];
@@ -85,23 +95,30 @@ const Brand = ({}) => {
   };
 
   useEffect(() => {
-    fetchBrands(searchKeyWords, currentPage, PAGE_SIZE);
+    fetchBrands(searchKeyWords, sort?.key, currentPage, PAGE_SIZE);
   }, []);
 
   const handleChangePage = async (page) => {
     setCurrentPage(page);
-    await fetchBrands(searchKeyWords, page, PAGE_SIZE);
+    await fetchBrands(searchKeyWords, sort?.key, page, PAGE_SIZE);
   };
 
   const handleSearch = async () => {
     setCurrentPage(1);
-    await fetchBrands(searchKeyWords, 1, PAGE_SIZE);
+    await fetchBrands(searchKeyWords, sort?.key, 1, PAGE_SIZE);
+  };
+
+  const handleSelectSort = async (value) => {
+    setSort(value);
+    setCurrentPage(1);
+    await fetchBrands(searchKeyWords, value?.key, 1, PAGE_SIZE);
   };
 
   const handleReset = async () => {
     setCurrentPage(1);
     setSearchKeyWords("");
-    await fetchBrands("", 1, PAGE_SIZE);
+    setSort(DEFAULT_SORT);
+    await fetchBrands("", DEFAULT_SORT.key, 1, PAGE_SIZE);
   };
 
   return (
@@ -125,6 +142,17 @@ const Brand = ({}) => {
             total: totalPages,
             pageSize: PAGE_SIZE,
             showTotal: (total) => `Tổng thương hiệu: ${total}`,
+          }}
+          sortMenu={{
+            hasSortMenu: true,
+            menu: [
+              {
+                title: "Sắp xếp",
+                menuItems: sorts,
+                selectedKey: sort,
+                setSelectedKey: (value) => handleSelectSort(value),
+              },
+            ],
           }}
           search={{
             hasSearchInput: true,

@@ -18,12 +18,13 @@ export const editBrand = (id, { name, description, image }) => {
   return axios.put(`/brand/edit/${id}`, formData);
 };
 
-export const getBrands = (search, page, limit) => {
+export const getBrands = (search, sort, page, limit) => {
   const params = new URLSearchParams();
 
   if (search) params.append("search", search);
   if (page) params.append("page", page);
   if (limit) params.append("limit", limit);
+  if (sort) params.append("sort", sort);
 
   return axios.get(`/brand/get?${params.toString()}`);
 };

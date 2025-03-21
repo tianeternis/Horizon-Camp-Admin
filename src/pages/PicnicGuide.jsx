@@ -206,6 +206,17 @@ const PicnicGuide = ({}) => {
     );
   };
 
+  const handleSearch = async () => {
+    setCurrentPage(1);
+    await fetchGuides(
+      selectedStatus?.key,
+      searchKeyWords,
+      sort?.key,
+      1,
+      PAGE_SIZE,
+    );
+  };
+
   const handleReset = async () => {
     setCurrentPage(1);
     setSelectedStatus(DEFAULT_STATUS);
@@ -302,7 +313,7 @@ const PicnicGuide = ({}) => {
             setValue: setSearchKeyWords,
             placeholder: "Tìm kiếm theo Tiêu đề cẩm nang",
             width: 400,
-            onSubmit: () => console.log(searchKeyWords),
+            onSubmit: () => handleSearch(),
           }}
           reset={{ hasResetButton: true, onClick: handleReset }}
           crudButton={{
