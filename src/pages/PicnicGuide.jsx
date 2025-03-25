@@ -23,7 +23,7 @@ import EditPicnicGuideModal from "@/components/picnicGuide/EditPicnicGuideModal"
 import ViewPicnicGuideModal from "@/components/picnicGuide/ViewPicnicGuideModal";
 
 const statuses = [
-  { key: "default", label: "Chọn trạng thái đăng tải" },
+  { key: "default", label: "Tất cả trạng thái" },
   {
     key: "published",
     label: "Đã đăng cẩm nang",

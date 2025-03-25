@@ -23,7 +23,7 @@ const FILTER_KEY = {
 };
 
 const statuses = [
-  { key: "all", label: "Tất cả" },
+  { key: "all", label: "Tất cả trạng thái" },
   { key: "visible", label: "Hiển thị sản phẩm" },
   { key: "invisible", label: "Ẩn sản phẩm" },
 ];
@@ -241,7 +241,7 @@ const Product = ({}) => {
             hasIndexColumn: true,
             scroll: {
               hasScroll: true,
-              scrollSetting: { scrollToFirstRowOnChange: true, y: 363 },
+              scrollSetting: { scrollToFirstRowOnChange: true, y: 341 },
             },
             loading: loading,
           }}
