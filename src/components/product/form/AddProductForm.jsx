@@ -577,7 +577,11 @@ const AddProductForm = ({ name = "", handleSave = (data) => {} }) => {
                             <Select
                               placeholder="Chọn màu sắc"
                               showSearch
-                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                option?.children?.props?.children?.[1]?.props?.children
+                                  ?.toLowerCase()
+                                  .includes(input.toLowerCase())
+                              }
                             >
                               {coloroptions.length > 0 &&
                                 coloroptions.map((color, i) => (
