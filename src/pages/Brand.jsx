@@ -199,7 +199,7 @@ const Brand = ({}) => {
           handleClose={() => setEditModal({ show: false, data: null })}
           brandID={editModal.data?._id}
           refetch={async () =>
-            await fetchBrands(searchKeyWords, currentPage, PAGE_SIZE)
+            await fetchBrands(searchKeyWords, sort?.key, currentPage, PAGE_SIZE)
           }
         />
       )}

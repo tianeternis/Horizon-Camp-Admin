@@ -199,7 +199,12 @@ const Category = ({}) => {
           handleClose={() => setEditModal({ show: false, data: null })}
           categoryID={editModal.data?._id}
           refetch={async () =>
-            await fetchCategories(searchKeyWords, currentPage, PAGE_SIZE)
+            await fetchCategories(
+              searchKeyWords,
+              sort?.key,
+              currentPage,
+              PAGE_SIZE,
+            )
           }
         />
       )}
