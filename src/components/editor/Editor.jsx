@@ -7,7 +7,7 @@ const Editor = ({
 }) => {
   const config = {
     placeholder: "Nhập nội dung",
-    autofocus: true,
+    // autofocus: true,
     uploader: {
       insertImageAsBase64URI: true,
     },
