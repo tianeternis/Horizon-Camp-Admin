@@ -19,6 +19,32 @@ Horizon Camp's Admin Dashboard system supports administrators in comprehensively
 - **Charting**: Chart.js
 - **API**: Kết nối RESTful API từ backend
 
+  ## 📂 Project Structure
+
+```bash
+Horizon-Camp-Admin/
+│── public/                # Public assets (favicon, static files)
+│── src/
+│   ├── assets/            # Images, icons, fonts
+│   ├── components/        # Reusable UI components
+│   ├── configs/           # App configurations
+│   ├── constants/         # Constant variables (routes, API keys, etc.)
+│   ├── hooks/             # Custom React hooks
+│   ├── layouts/           # Layout wrappers (MainLayout, etc.)
+│   ├── pages/             # Main pages (Dashboard, Users, Orders, Products, etc.)
+│   ├── redux/             # Redux slices, store configuration
+│   ├── routes/            # App routes definitions
+│   ├── services/          # API calls & external services
+│   ├── utils/             # Helper functions (format, validation, etc.)
+│   ├── App.jsx            # Main application component
+│   └── index.css          # Global styles
+│
+├── .env.example           # Example environment variables
+├── package.json           # Project dependencies & scripts
+├── README.md              # Project documentation
+└── .gitignore             # Git ignore rules
+```
+
 ## ⚙️ Installation
 ```bash
 git clone https://github.com/tianeternis/Horizon-Camp-Admin.git
